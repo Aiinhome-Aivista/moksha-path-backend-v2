@@ -328,125 +328,125 @@ def send_ui_otp_v4():
 # =========================================================
 # API 2: VERIFY OTP AND LOGIN/REGISTER (v4)
 # =========================================================
-def verify_and_login_v4():
-    """ 
-    POST /auth/v4/verify-and-login
-    Validates OTP. 
-    - 1 Complete Profile -> Creates session & logs in.
-    - Multiple/Incomplete -> Skips session, returns records & temporary token with user details.
-    """
-    conn = None
-    try:
-        data = request.get_json()
-        auth_identifier = data.get('auth_identifier')
-        otp = data.get('otp')
-        email = data.get('email', '')
-        mobile = data.get('mobile', '') or data.get('phone', '')
+# def verify_and_login_v4():
+#     """ 
+#     POST /auth/v4/verify-and-login
+#     Validates OTP. 
+#     - 1 Complete Profile -> Creates session & logs in.
+#     - Multiple/Incomplete -> Skips session, returns records & temporary token with user details.
+#     """
+#     conn = None
+#     try:
+#         data = request.get_json()
+#         auth_identifier = data.get('auth_identifier')
+#         otp = data.get('otp')
+#         email = data.get('email', '')
+#         mobile = data.get('mobile', '') or data.get('phone', '')
         
-        ip_address = request.remote_addr
-        user_agent = request.headers.get('User-Agent', '')
+#         ip_address = request.remote_addr
+#         user_agent = request.headers.get('User-Agent', '')
         
-        random_str = str(uuid.uuid4())
-        refresh_token = hashlib.md5(random_str.encode()).hexdigest()
+#         random_str = str(uuid.uuid4())
+#         refresh_token = hashlib.md5(random_str.encode()).hexdigest()
 
-        if not auth_identifier or not otp:
-            return api_response(message="auth_identifier and otp are required", code=400, status="error")
+#         if not auth_identifier or not otp:
+#             return api_response(message="auth_identifier and otp are required", code=400, status="error")
 
-        conn = get_db_connection()
-        conn.autocommit = True
-        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+#         conn = get_db_connection()
+#         conn.autocommit = True
+#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        cur.execute(
-            """CALL login.usp_v4_verify_otp_and_loginv1(
-                %s, %s, %s, %s, %s, %s, %s, 
-                '{}'::jsonb, 0::integer, ''::varchar, 0::integer
-            )""", 
-            (auth_identifier, otp, email, mobile, ip_address, user_agent, refresh_token)
-        )
-        result = cur.fetchone()
+#         cur.execute(
+#             """CALL login.usp_v4_verify_otp_and_loginv1(
+#                 %s, %s, %s, %s, %s, %s, %s, 
+#                 '{}'::jsonb, 0::integer, ''::varchar, 0::integer
+#             )""", 
+#             (auth_identifier, otp, email, mobile, ip_address, user_agent, refresh_token)
+#         )
+#         result = cur.fetchone()
 
-        if result['o_status_code'] == 200:
-            profiles = result['o_profiles_json']
-            session_id = result['o_session_id']
+#         if result['o_status_code'] == 200:
+#             profiles = result['o_profiles_json']
+#             session_id = result['o_session_id']
 
-            exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
-            exp_str = exp_time.strftime('%a, %d %b %Y %H:%M:%S GMT') 
+#             exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+#             exp_str = exp_time.strftime('%a, %d %b %Y %H:%M:%S GMT') 
 
-            if session_id:
-                # SCENARIO A: 1 Complete Profile (Fully Logged In)
+#             if session_id:
+#                 # SCENARIO A: 1 Complete Profile (Fully Logged In)
                 
-                # =======================================================================
-                # SMART FIX: Grab the EXACT profile slot the database assigned this device
-                # =======================================================================
-                current_profile = next((p for p in profiles if p.get('current_user') is True), profiles[0])
+#                 # =======================================================================
+#                 # SMART FIX: Grab the EXACT profile slot the database assigned this device
+#                 # =======================================================================
+#                 current_profile = next((p for p in profiles if p.get('current_user') is True), profiles[0])
                 
-                roles = current_profile.get('roles') or []
-                active_sub_id = roles[0].get('subscription_id') if roles else None
-                role_id = roles[0].get('role_id') if roles else None
+#                 roles = current_profile.get('roles') or []
+#                 active_sub_id = roles[0].get('subscription_id') if roles else None
+#                 role_id = roles[0].get('role_id') if roles else None
 
-                # =======================================================================
-                # JWT FIX: Explicitly map email, mobile, and username here!
-                # =======================================================================
-                jwt_payload = {
-                    "sub": str(current_profile.get('sub')),
-                    "name": current_profile.get('name'),
-                    "username": current_profile.get('username'),
-                    "email": current_profile.get('email'),        # <--- ADDED
-                    "mobile": current_profile.get('mobile'),      # <--- ADDED
-                    "role_id": role_id,
-                    "roles": roles,
-                    "sid": str(session_id),
-                    "sub_id": active_sub_id,
-                    "exp": int(exp_time.timestamp()) 
-                }
-                token = jwt.encode(jwt_payload, JWT_SECRET, algorithm="HS256")
+#                 # =======================================================================
+#                 # JWT FIX: Explicitly map email, mobile, and username here!
+#                 # =======================================================================
+#                 jwt_payload = {
+#                     "sub": str(current_profile.get('sub')),
+#                     "name": current_profile.get('name'),
+#                     "username": current_profile.get('username'),
+#                     "email": current_profile.get('email'),        # <--- ADDED
+#                     "mobile": current_profile.get('mobile'),      # <--- ADDED
+#                     "role_id": role_id,
+#                     "roles": roles,
+#                     "sid": str(session_id),
+#                     "sub_id": active_sub_id,
+#                     "exp": int(exp_time.timestamp()) 
+#                 }
+#                 token = jwt.encode(jwt_payload, JWT_SECRET, algorithm="HS256")
 
-                user_response = jwt_payload.copy()
-                user_response["exp"] = exp_str
+#                 user_response = jwt_payload.copy()
+#                 user_response["exp"] = exp_str
 
-                final_response = {
-                    "refresh_token": refresh_token,
-                    "subscription_id": active_sub_id,
-                    "token": token,
-                    "user": user_response
-                }
-            else:
-                # SCENARIO B: Multi-Profile OR Incomplete (Session Skipped)
-                first_profile = profiles[0] if profiles else {}
-                first_roles = first_profile.get('roles') or []
-                first_role_id = first_roles[0].get('role_id') if first_roles else None
+#                 final_response = {
+#                     "refresh_token": refresh_token,
+#                     "subscription_id": active_sub_id,
+#                     "token": token,
+#                     "user": user_response
+#                 }
+#             else:
+#                 # SCENARIO B: Multi-Profile OR Incomplete (Session Skipped)
+#                 first_profile = profiles[0] if profiles else {}
+#                 first_roles = first_profile.get('roles') or []
+#                 first_role_id = first_roles[0].get('role_id') if first_roles else None
                 
-                # Also add them to the temporary setup token just in case your frontend needs them!
-                account_payload = {
-                    "sub": str(first_profile.get('sub', '')),
-                    "email": first_profile.get('email'),
-                    "mobile": first_profile.get('mobile'),
-                    "username": first_profile.get('username'),
-                    "auth_identifier": auth_identifier,
-                    "role_id": first_role_id,
-                    "status": "profile_selection_required",
-                    "exp": int(exp_time.timestamp())
-                }
-                token = jwt.encode(account_payload, JWT_SECRET, algorithm="HS256")
+#                 # Also add them to the temporary setup token just in case your frontend needs them!
+#                 account_payload = {
+#                     "sub": str(first_profile.get('sub', '')),
+#                     "email": first_profile.get('email'),
+#                     "mobile": first_profile.get('mobile'),
+#                     "username": first_profile.get('username'),
+#                     "auth_identifier": auth_identifier,
+#                     "role_id": first_role_id,
+#                     "status": "profile_selection_required",
+#                     "exp": int(exp_time.timestamp())
+#                 }
+#                 token = jwt.encode(account_payload, JWT_SECRET, algorithm="HS256")
                 
-                final_response = {
-                    "refresh_token": None,
-                    "subscription_id": None,
-                    "token": token,
-                    "user": None,          
-                    "profiles": profiles   
-                }
+#                 final_response = {
+#                     "refresh_token": None,
+#                     "subscription_id": None,
+#                     "token": token,
+#                     "user": None,          
+#                     "profiles": profiles   
+#                 }
 
-            return api_response(message=result['o_message'], code=200, data=final_response, status="success")
+#             return api_response(message=result['o_message'], code=200, data=final_response, status="success")
             
-        return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
+#         return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
 
-    except Exception as e:
-        return api_response(message=str(e), code=500, status="error")
-    finally:
-        if conn: 
-            cur.close()
-            conn.close()
+#     except Exception as e:
+#         return api_response(message=str(e), code=500, status="error")
+#     finally:
+#         if conn: 
+#             cur.close()
+#             conn.close()
 
 # =========================================================
 # API 3: SELECT PROFILE (v4)
@@ -634,24 +634,272 @@ def verify_and_login_v4():
 
  
 
+# def select_profile_v4():
+#     """ 
+#     POST /auth/v4/select-profile
+#     User clicks a specific profile. Handles active sessions across multiple devices.
+#     Body: { "user_id": 470, "subscription_id": "...", "force_login": true/false }
+#     """
+#     conn = None
+#     try:
+#         # =====================================================================
+#         # 1. EXTRACT CURRENT USER AND SPECIFIC SESSION FROM JWT 
+#         # =====================================================================
+#         payload = TokenVerifier.get_user_payload()
+#         current_user_id = payload.get('sub') if payload else None
+#         current_session_id = payload.get('sid') if payload else None
+
+#         # =====================================================================
+#         # 2. PARSE INCOMING REQUEST FOR TARGET USER
+#         # =====================================================================
+#         data = request.get_json()
+#         target_user_id = data.get('user_id')
+#         subscription_id = data.get('subscription_id') 
+#         force_login = data.get('force_login', False) 
+        
+#         if not target_user_id:
+#             return api_response(message="user_id is required", code=400, status="error")
+
+#         ip_address = request.remote_addr
+#         user_agent = request.headers.get('User-Agent', '')
+        
+#         random_str = str(uuid.uuid4())
+#         refresh_token = hashlib.md5(random_str.encode()).hexdigest()
+
+#         conn = get_db_connection()
+#         conn.autocommit = True
+#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+#         # =====================================================================
+#         # 3. PINPOINT LOGOUT FOR THE CURRENT USER (Call new SP)
+#         # =====================================================================
+#         # If they pass the token for 471, and want to log into 470, kill 471's session!
+#         if current_session_id and current_user_id and str(current_user_id) != str(target_user_id):
+#             cur.execute(
+#                 "CALL login.usp_v4_logout_session(%s::integer, %s::bigint)",
+#                 (current_session_id, current_user_id)
+#             )
+
+#         # =====================================================================
+#         # 4. CALL SP TO LOGIN NEW TARGET USER 
+#         # =====================================================================
+#         cur.execute(
+#             """CALL login.usp_v4_select_profile(
+#                 %s::bigint, %s, %s, %s, %s, %s::boolean,
+#                 ''::varchar, ''::varchar, ''::varchar, ''::varchar, '{}'::jsonb, 0::integer, ''::varchar, 0::integer
+#             )""", 
+#             (target_user_id, subscription_id, ip_address, user_agent, refresh_token, force_login)
+#         )
+#         result = cur.fetchone()
+
+#         if result['o_status_code'] == 200:
+#             session_id = result['o_session_id']
+#             full_name = result['o_full_name']
+#             username = result['o_username']
+#             email = result['o_email']
+#             mobile = result['o_phone']
+#             roles = result['o_role_json']
+            
+#             active_sub_id = roles[0].get('subscription_id') if roles else subscription_id
+
+#             exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+#             exp_str = exp_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
+
+#             # =================================================================
+#             # 5. GENERATE BRAND NEW JWT FOR THE TARGET USER
+#             # =================================================================
+#             jwt_payload = {
+#                 "sub": str(target_user_id),
+#                 "email": email,             
+#                 "mobile": mobile,           
+#                 "name": full_name,
+#                 "username": username,
+#                 "role_id": roles[0].get('role_id') if roles else None,
+#                 "roles": roles,
+#                 "sid": str(session_id),
+#                 "sub_id": active_sub_id,
+#                 "exp": int(exp_time.timestamp()) 
+#             }
+#             token = jwt.encode(jwt_payload, JWT_SECRET, algorithm="HS256")
+            
+#             user_response = jwt_payload.copy()
+#             user_response["exp"] = exp_str
+
+#             final_response = {
+#                 "refresh_token": refresh_token,
+#                 "subscription_id": active_sub_id,
+#                 "token": token,
+#                 "user": user_response
+#             }
+#             return api_response(message=result['o_message'], code=200, data=final_response, status="success")
+
+#         elif result['o_status_code'] == 409:
+#             return api_response(
+#                 message=result['o_message'], 
+#                 code=200, 
+#                 data={"requires_force_login": True}, 
+#                 status="success"
+#             )
+            
+#         return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
+
+#     except Exception as e:
+#         return api_response(message=str(e), code=500, status="error")
+#     finally:
+#         if conn: 
+#             cur.close()
+#             conn.close()
+
+# =========================================================
+# API 2: VERIFY OTP AND LOGIN/REGISTER (v4)
+# =========================================================
+def verify_and_login_v4():
+    """ 
+    POST /auth/v4/verify-and-login
+    Validates OTP. 
+    - 1 Complete Profile -> Creates session & logs in (returns two tokens).
+    - Multiple/Incomplete -> Skips session, returns records & temporary token with user details.
+    """
+    conn = None
+    try:
+        data = request.get_json()
+        auth_identifier = data.get('auth_identifier')
+        otp = data.get('otp')
+        email = data.get('email', '')
+        mobile = data.get('mobile', '') or data.get('phone', '')
+        
+        ip_address = request.remote_addr
+        user_agent = request.headers.get('User-Agent', '')
+        
+        random_str = str(uuid.uuid4())
+        refresh_token = hashlib.md5(random_str.encode()).hexdigest()
+
+        if not auth_identifier or not otp:
+            return api_response(message="auth_identifier and otp are required", code=400, status="error")
+
+        conn = get_db_connection()
+        conn.autocommit = True
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+        
+        cur.execute(
+            """CALL login.usp_v4_verify_otp_and_loginv1(
+                %s, %s, %s, %s, %s, %s, %s, 
+                '{}'::jsonb, 0::integer, ''::varchar, 0::integer
+            )""", 
+            (auth_identifier, otp, email, mobile, ip_address, user_agent, refresh_token)
+        )
+        result = cur.fetchone()
+
+        if result['o_status_code'] == 200:
+            profiles = result['o_profiles_json']
+            session_id = result['o_session_id']
+
+            exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
+            exp_str = exp_time.strftime('%a, %d %b %Y %H:%M:%S GMT') 
+
+            if session_id:
+                # SCENARIO A: 1 Complete Profile (Fully Logged In)
+                current_profile = next((p for p in profiles if p.get('current_user') is True), profiles[0])
+                
+                roles = current_profile.get('roles') or []
+                active_sub_id = roles[0].get('subscription_id') if roles else None
+                role_id = roles[0].get('role_id') if roles else None
+                # =========================================================
+                # STRIP SUBSCRIPTION ID FROM ROLES BEFORE TOKEN CREATION
+                # =========================================================
+                cleaned_roles = [{k: v for k, v in r.items() if k != 'subscription_id'} for r in roles]
+
+                # =========================================================
+                # TOKEN 1: MAIN AUTH TOKEN (NO SUBSCRIPTION ID)
+                # =========================================================
+                jwt_payload = {
+                    "sub": str(current_profile.get('sub')),
+                    "name": current_profile.get('name'),
+                    "username": current_profile.get('username'),
+                    "email": current_profile.get('email'),
+                    "mobile": current_profile.get('mobile'),
+                    "role_id": role_id,
+                    "roles": cleaned_roles,
+                    "sid": str(session_id),
+                    "exp": int(exp_time.timestamp()) 
+                }
+                token = jwt.encode(jwt_payload, JWT_SECRET, algorithm="HS256")
+
+                # =========================================================
+                # TOKEN 2: SEPARATE SUBSCRIPTION TOKEN
+                # =========================================================
+                sub_token = None
+                if active_sub_id:
+                    sub_payload = {
+                        "subscription_id": active_sub_id,
+                        "exp": int(exp_time.timestamp())
+                    }
+                    sub_token = jwt.encode(sub_payload, JWT_SECRET, algorithm="HS256")
+
+                # Build response object
+                user_response = jwt_payload.copy()
+                user_response["exp"] = exp_str
+
+                final_response = {
+                    "refresh_token": refresh_token,
+                    "subscription_id": active_sub_id,
+                    "token": token,
+                    "subscription_token": sub_token, # Send the new separate token
+                    "user": user_response
+                }
+            else:
+                # SCENARIO B: Multi-Profile OR Incomplete (Session Skipped)
+                first_profile = profiles[0] if profiles else {}
+                first_roles = first_profile.get('roles') or []
+                first_role_id = first_roles[0].get('role_id') if first_roles else None
+                
+                account_payload = {
+                    "sub": str(first_profile.get('sub', '')),
+                    "email": first_profile.get('email'),
+                    "mobile": first_profile.get('mobile'),
+                    "username": first_profile.get('username'),
+                    "auth_identifier": auth_identifier,
+                    "role_id": first_role_id,
+                    "status": "profile_selection_required",
+                    "exp": int(exp_time.timestamp())
+                }
+                token = jwt.encode(account_payload, JWT_SECRET, algorithm="HS256")
+                
+                final_response = {
+                    "refresh_token": None,
+                    "subscription_id": None,
+                    "token": token,
+                    "subscription_token": None, # No subscription selected yet
+                    "user": None,          
+                    "profiles": profiles   
+                }
+
+            return api_response(message=result['o_message'], code=200, data=final_response, status="success")
+            
+        return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
+
+    except Exception as e:
+        return api_response(message=str(e), code=500, status="error")
+    finally:
+        if conn: 
+            cur.close()
+            conn.close()
+
 def select_profile_v4():
     """ 
     POST /auth/v4/select-profile
     User clicks a specific profile. Handles active sessions across multiple devices.
+    Returns two separate tokens: Main Auth and Subscription.
     Body: { "user_id": 470, "subscription_id": "...", "force_login": true/false }
     """
     conn = None
     try:
-        # =====================================================================
-        # 1. EXTRACT CURRENT USER AND SPECIFIC SESSION FROM JWT 
-        # =====================================================================
+        # Extract Current User
         payload = TokenVerifier.get_user_payload()
         current_user_id = payload.get('sub') if payload else None
         current_session_id = payload.get('sid') if payload else None
 
-        # =====================================================================
-        # 2. PARSE INCOMING REQUEST FOR TARGET USER
-        # =====================================================================
+        # Parse Incoming Data
         data = request.get_json()
         target_user_id = data.get('user_id')
         subscription_id = data.get('subscription_id') 
@@ -670,19 +918,14 @@ def select_profile_v4():
         conn.autocommit = True
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # =====================================================================
-        # 3. PINPOINT LOGOUT FOR THE CURRENT USER (Call new SP)
-        # =====================================================================
-        # If they pass the token for 471, and want to log into 470, kill 471's session!
+        # Kill previous session if switching users
         if current_session_id and current_user_id and str(current_user_id) != str(target_user_id):
             cur.execute(
                 "CALL login.usp_v4_logout_session(%s::integer, %s::bigint)",
                 (current_session_id, current_user_id)
             )
 
-        # =====================================================================
-        # 4. CALL SP TO LOGIN NEW TARGET USER 
-        # =====================================================================
+        # Log into target user
         cur.execute(
             """CALL login.usp_v4_select_profile(
                 %s::bigint, %s, %s, %s, %s, %s::boolean,
@@ -698,15 +941,20 @@ def select_profile_v4():
             username = result['o_username']
             email = result['o_email']
             mobile = result['o_phone']
-            roles = result['o_role_json']
+            roles = result['o_role_json'] or []
             
             active_sub_id = roles[0].get('subscription_id') if roles else subscription_id
 
             exp_time = datetime.datetime.utcnow() + datetime.timedelta(hours=12)
             exp_str = exp_time.strftime('%a, %d %b %Y %H:%M:%S GMT')
 
+            # =========================================================
+            # STRIP SUBSCRIPTION ID FROM ROLES BEFORE TOKEN CREATION
+            # =========================================================
+            cleaned_roles = [{k: v for k, v in r.items() if k != 'subscription_id'} for r in roles]
+
             # =================================================================
-            # 5. GENERATE BRAND NEW JWT FOR THE TARGET USER
+            # TOKEN 1: MAIN AUTH TOKEN (No Sub ID)
             # =================================================================
             jwt_payload = {
                 "sub": str(target_user_id),
@@ -715,13 +963,24 @@ def select_profile_v4():
                 "name": full_name,
                 "username": username,
                 "role_id": roles[0].get('role_id') if roles else None,
-                "roles": roles,
+                "roles": cleaned_roles,  # <--- USE THE CLEANED ROLES HERE
                 "sid": str(session_id),
-                "sub_id": active_sub_id,
                 "exp": int(exp_time.timestamp()) 
             }
             token = jwt.encode(jwt_payload, JWT_SECRET, algorithm="HS256")
             
+            # =================================================================
+            # TOKEN 2: SEPARATE SUBSCRIPTION TOKEN
+            # =================================================================
+            sub_token = None
+            if active_sub_id:
+                sub_payload = {
+                    "subscription_id": active_sub_id,
+                    "exp": int(exp_time.timestamp())
+                }
+                sub_token = jwt.encode(sub_payload, JWT_SECRET, algorithm="HS256")
+
+
             user_response = jwt_payload.copy()
             user_response["exp"] = exp_str
 
@@ -729,6 +988,7 @@ def select_profile_v4():
                 "refresh_token": refresh_token,
                 "subscription_id": active_sub_id,
                 "token": token,
+                "subscription_token": sub_token, # Send new sub token
                 "user": user_response
             }
             return api_response(message=result['o_message'], code=200, data=final_response, status="success")
