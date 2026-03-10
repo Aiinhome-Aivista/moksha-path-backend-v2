@@ -61,7 +61,7 @@ def get_youtube_videos(query, max_results=7):
         return videos
 
     except Exception as e:
-        print(e)
+        # print(e)
         return []
 
 
@@ -188,7 +188,7 @@ def get_or_generate_chapter_topic_resources():
 
             match = re.search(r'\{.*\}', llm_response or "", re.DOTALL)
             if not match:
-                print("LLM response invalid")
+                # print("LLM response invalid")
                 continue
 
             try:
