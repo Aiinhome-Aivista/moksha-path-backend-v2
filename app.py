@@ -79,6 +79,8 @@ from controllers.parents.parent_dashboard_controller import (
     get_parent_consistency_score, get_parent_exam_readiness, get_parent_pending_tasks, 
     get_parent_subjectwise_average_score, get_parent_student_subjects, get_parent_student_strength_weakness
 )
+
+from controllers.parents.get_parent_profile_details import get_parent_profile_details
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -580,7 +582,9 @@ def parent_average_score_route():
 def get_parent_student_strength_weakness_route():
     return get_parent_student_strength_weakness()
 
-
+@app.route(PARENT_TEACHER_URL + '/dashboard/parent/parent-profile', methods=['GET'])
+def parent_profile_route():
+    return get_parent_profile_details()
 
    
 # ==========================================
