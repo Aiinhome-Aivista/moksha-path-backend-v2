@@ -420,15 +420,18 @@ def verify_and_login_v4():
                 first_profile = profiles[0] if profiles else {}
                 first_roles = first_profile.get('roles') or []
                 first_role_id = first_roles[0].get('role_id') if first_roles else None
+                user_id_str = str(first_profile.get('sub', ''))
                 
                 # Temporary setup token
                 account_payload = {
-                    "sub": str(first_profile.get('sub', '')),
+                    # "sub": str(first_profile.get('sub', '')),
+                    "sub": user_id_str,
                     "email": first_profile.get('email'),
                     "mobile": first_profile.get('mobile'),
                     "username": first_profile.get('username'),
                     "auth_identifier": auth_identifier,
                     "role_id": first_role_id,
+                    "sid": user_id_str,
                     "status": "profile_selection_required",
                     "exp": int(exp_time.timestamp())
                 }
