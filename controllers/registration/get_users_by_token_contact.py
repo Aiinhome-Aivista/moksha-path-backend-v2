@@ -1,7 +1,135 @@
+# from flask import request
+# from config import get_db_connection
+# from utils.api_response import api_response
+# from utils.token_helper import TokenVerifier
+# import psycopg2.extras
+
+
+# # =========================================================
+# # GET API: Fetch Users by Token Contact
+# # =========================================================
+# def get_users_by_token_contact():
+
+#     conn = None
+#     cur = None
+
+#     try:
+
+#         # =====================================================
+#         # 1. Get FULL token payload (Correct Method)
+#         # =====================================================
+
+#         token_payload = TokenVerifier.get_user_payload()
+#         print(f"Token Payload: {token_payload}")  # Debugging line to check payload content
+#         if not token_payload:
+#             return api_response(
+#                 message="Unauthorized",
+#                 code=401,
+#                 status="error"
+#             )
+
+
+#         # =====================================================
+#         # 2. Extract email & mobile from token
+#         # =====================================================
+         
+#         email = token_payload.get("email")
+#         mobile = token_payload.get("mobile")
+
+#         # fallback if token uses different key
+#         if not mobile:
+#             mobile = token_payload.get("phone")
+
+#         if not email and not mobile:
+#             return api_response(
+#                 message="Email or Mobile not found in token",
+#                 code=400,
+#                 status="error"
+#             )
+
+
+#         # =====================================================
+#         # 3. DB Connection
+#         # =====================================================
+
+#         conn = get_db_connection()
+
+#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+
+#         # =====================================================
+#         # 4. Call Stored Procedure
+#         # =====================================================
+
+#         cur.execute(
+#             """
+#             CALL login.usp_v5_get_users_by_contact(
+#                 %s,
+#                 %s,
+#                 NULL,
+#                 NULL,
+#                 NULL
+#             )
+#             """,
+#             (email, mobile)
+#         )
+
+
+#         result = cur.fetchone()
+
+
+#         # =====================================================
+#         # 5. Handle Response
+#         # =====================================================
+
+#         if not result:
+#             return api_response(
+#                 message="No response from database",
+#                 code=500,
+#                 status="error"
+#             )
+
+
+#         if result['p_status'] == 'true':
+
+#             return api_response(
+#                 message=result['p_message'],
+#                 code=200,
+#                 status="success",
+#                 data=result['p_data']
+#             )
+
+#         else:
+
+#             return api_response(
+#                 message=result['p_message'],
+#                 code=404,
+#                 status="error"
+#             )
+
+
+#     except Exception as e:
+
+#         return api_response(
+#             message="Internal Server Error",
+#             code=500,
+#             status="error",
+#             error=str(e)
+#         )
+
+
+#     finally:
+
+#         if cur:
+#             cur.close()
+
+#         if conn:
+#             conn.close()
+
 from flask import request
-from config import get_db_connection
+import jwt
+from config import get_db_connection, JWT_SECRET
 from utils.api_response import api_response
-from utils.token_helper import TokenVerifier
 import psycopg2.extras
 
 
@@ -9,36 +137,30 @@ import psycopg2.extras
 # GET API: Fetch Users by Token Contact
 # =========================================================
 def get_users_by_token_contact():
-
     conn = None
     cur = None
 
     try:
-
         # =====================================================
-        # 1. Get FULL token payload (Correct Method)
+        # 1. Manually Decode Token (Bypasses the strict Session ID check)
         # =====================================================
+        auth_header = request.headers.get('Authorization')
+        if not auth_header:
+            return api_response(message="Unauthorized: Missing Token", code=401, status="error")
 
-        token_payload = TokenVerifier.get_user_payload()
-        print(f"Token Payload: {token_payload}")  # Debugging line to check payload content
-        if not token_payload:
-            return api_response(
-                message="Unauthorized",
-                code=401,
-                status="error"
-            )
+        try:
+            token = auth_header.split(" ")[1] if "Bearer" in auth_header else auth_header
+            token_payload = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+        except Exception as e:
+            return api_response(message=f"Unauthorized: Invalid token ({str(e)})", code=401, status="error")
 
+        print(f"Token Payload: {token_payload}")  # Debugging line
 
         # =====================================================
         # 2. Extract email & mobile from token
         # =====================================================
-         
         email = token_payload.get("email")
-        mobile = token_payload.get("mobile")
-
-        # fallback if token uses different key
-        if not mobile:
-            mobile = token_payload.get("phone")
+        mobile = token_payload.get("mobile") or token_payload.get("phone")
 
         if not email and not mobile:
             return api_response(
@@ -47,20 +169,16 @@ def get_users_by_token_contact():
                 status="error"
             )
 
-
         # =====================================================
         # 3. DB Connection
         # =====================================================
-
         conn = get_db_connection()
-
+        conn.autocommit = True # Recommended when calling Procedures
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-
 
         # =====================================================
         # 4. Call Stored Procedure
         # =====================================================
-
         cur.execute(
             """
             CALL login.usp_v5_get_users_by_contact(
@@ -73,15 +191,11 @@ def get_users_by_token_contact():
             """,
             (email, mobile)
         )
-
-
         result = cur.fetchone()
-
 
         # =====================================================
         # 5. Handle Response
         # =====================================================
-
         if not result:
             return api_response(
                 message="No response from database",
@@ -89,27 +203,24 @@ def get_users_by_token_contact():
                 status="error"
             )
 
-
-        if result['p_status'] == 'true':
-
+        # Note: If p_status is returned as a boolean from PostgreSQL, 
+        # it might be `True` instead of the string 'true'. 
+        # Checking for both just to be absolutely safe!
+        if result['p_status'] == 'true' or result['p_status'] is True:
             return api_response(
                 message=result['p_message'],
                 code=200,
                 status="success",
                 data=result['p_data']
             )
-
         else:
-
             return api_response(
                 message=result['p_message'],
                 code=404,
                 status="error"
             )
 
-
     except Exception as e:
-
         return api_response(
             message="Internal Server Error",
             code=500,
@@ -117,11 +228,6 @@ def get_users_by_token_contact():
             error=str(e)
         )
 
-
     finally:
-
-        if cur:
-            cur.close()
-
-        if conn:
-            conn.close()
+        if cur: cur.close()
+        if conn: conn.close()
