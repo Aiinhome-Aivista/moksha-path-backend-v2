@@ -6,6 +6,8 @@ from config import get_db_connection
 import sys
 
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
+from controllers.common.get_institute_hierarchy import get_institute_hierarchy
+from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
 from controllers.parents.get_teacher_dashboard import get_teacher_dashboard_assessments
 from controllers.parents.get_user_detils import get_academic_hierarchy
 from controllers.parents.student_notification_assessments import get_student_notification_assessments
@@ -45,7 +47,7 @@ from controllers.common.validate_subscription_amount import validate_subscriptio
 from controllers.common.decode_access_token import decode_access_token
 from controllers.common.user_profile import get_user_profiles, switch_profile
 from controllers.common.get_save_academic_details.save_user_academic_details import  save_user_academic_details
-# from controllers.students.assessment.ai_question_controller import generate_and_store_questions 
+from controllers.students.assessment.ai_question_controller import generate_and_store_questions 
 from controllers.students.assessment.assign_controller import assign_auto_assessment
 from controllers.students.assessment.attempt_controller import finish_assessment, get_assessment_details, save_single_answer, start_assessment_attempt, submit_assessment_result
 from controllers.students.assessment.student_dashboard_controller import get_student_assessments
@@ -302,6 +304,16 @@ def username_check_route():
 def get_usernames_route():
     return get_all_usernames()
 
+@app.route(USER_URL + '/get_institute_hierarchy', methods=['GET'])
+def get_institute_hierarchy_route():
+    return get_institute_hierarchy()
+
+@app.route(USER_URL + '/get_all_usernames_with_paginations', methods=['POST'])
+def get_all_usernames_with_paginations_route():
+    return get_all_usernames_with_paginations()
+
+
+
 # ==========================================
 # learning_routes
 
@@ -351,9 +363,9 @@ def get_chapter_topic_ai_resources_route():
 # ==========================================
 # Student Assessment Routes
 # ==========================================
-# @app.route(LEARNING + '/store_questions', methods=["POST"])
-# def generate_and_store_questions_route():
-#     return generate_and_store_questions()
+@app.route(LEARNING + '/store_questions', methods=["POST"])
+def generate_and_store_questions_route():
+    return generate_and_store_questions()
 
 @app.route(LEARNING + '/assign_assessment', methods=["POST"])
 def assign_assessment_route():
