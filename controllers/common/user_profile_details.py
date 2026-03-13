@@ -101,20 +101,19 @@ def update_user_profile():
 # =========================================================
 # GET ACADEMIC / STUDENT DETAILS
 # =========================================================
+
 def get_academic_details():
     """ 
     GET /api/v1/profile/academic
-    Fetches Enrollment Date, Institute, Board, Class, and Section for the active subscription.
+    Fetches Enrollment Date, Institute, Board, Class, Year, and Section for the active subscription.
     """
     conn = None
     try:
-        # 1. Get full token payload to extract user_id and subscription_id
         token_payload = TokenVerifier.get_user_payload()
         if not token_payload:
             return api_response(message="Unauthorized", code=401, status="error")
         
         user_id = int(token_payload.get('sub'))
-        # Handle both possible token keys for subscription ID
         subscription_id = token_payload.get('subscription_id') or token_payload.get('sub_id')
 
         if not subscription_id:
@@ -123,18 +122,17 @@ def get_academic_details():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         
-        # 2. Call the SP (Passing 2 inputs + 7 NULLs for outputs)
+        # 2. Call the SP (Passing 2 inputs + 8 NULLs for outputs = 10 total)
         cur.execute("""
             CALL common.usp_get_academic_details(
-                %s, %s, NULL, NULL, NULL, NULL, NULL, NULL, NULL
+                %s, %s, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
             )
         """, (user_id, subscription_id))
         result = cur.fetchone()
         
-        # 3. Format and Return Data
         if result['p_status_code'] == 200:
             
-            # Format the date to standard "DD Mon YYYY" (e.g. 13 Mar 2026)
+            # Format the date
             enrollment_date = None
             if result['p_enrollment_date']:
                 enrollment_date = result['p_enrollment_date'].strftime('%d %b %Y')
@@ -151,6 +149,7 @@ def get_academic_details():
                 "institute_name": result['p_institute_name'] or "N/A",
                 "board_name": result['p_board_name'] or "N/A",
                 "class_name": result['p_class_name'] or "N/A",
+                "academic_year": result['p_academic_year'] or "N/A", # <-- ADDED THIS
                 "section_name": section_name
             }
             return api_response(message=result['p_message'], code=200, data=data, status="success")
