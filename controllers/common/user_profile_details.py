@@ -33,8 +33,7 @@ def get_user_profile():
                 "full_name": result['p_full_name'],
                 "email": result['p_email'],
                 "mobile": result['p_mobile'],
-                # Safely format date to YYYY-MM-DD for React input type="date"
-                "dob": result['p_dob'].strftime('%Y-%m-%d') if result['p_dob'] else None,
+                "dob": result['p_dob'].strftime('%d-%m-%Y') if result['p_dob'] else None,
                 "address": result['p_address']
             }
             return api_response(message=result['p_message'], code=200, data=data, status="success")
