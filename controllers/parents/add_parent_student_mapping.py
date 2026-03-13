@@ -235,8 +235,50 @@ def get_pending_mapping_requests():
 
 
  
-
  
+def get_invitation_all_summary():
+    conn = None
+    try:
+        # 1. AUTHENTICATION
+        user_id_str, auth_error = TokenVerifier.get_user_id()
+        if not user_id_str: 
+            return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
+        
+        logged_in_user_id = int(user_id_str)
+
+        # 2. DATABASE CALL
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        query = """
+            CALL common.usp_get_assigned_users_list_v1(
+                %s::INTEGER, 
+                NULL, NULL, NULL
+            )
+        """
+        cur.execute(query, (logged_in_user_id,))
+        result = cur.fetchone()
+
+        if not result:
+            return api_response(message="Database returned no response", code=404, status="error")
+
+        res_status  = result.get('p_status', 'error')
+        res_message = result.get('p_message', 'No message')
+        res_data    = result.get('p_data', {})
+
+        if res_status == 'success':
+            return api_response(message=res_message, data=res_data, code=200, status="success")
+        else:
+            return api_response(message=res_message, data=res_data, code=400, status="error")
+
+    except Exception as e:
+        print(f"CRITICAL_DEBUG: {repr(e)}") 
+        return api_response(message="System Error", code=500, status="error", error=str(e))
+    finally:
+        if conn: 
+            conn.close()
+
+
 def get_active_user_student_parent_list():
     conn = None
     try:

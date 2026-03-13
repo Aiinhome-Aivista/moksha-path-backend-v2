@@ -8,7 +8,7 @@ import sys
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
 from controllers.common.get_institute_hierarchy import get_institute_hierarchy
 from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
-from controllers.parents.add_parent_student_mapping import add_parent_student_mapping, create_and_map_dependent_profile, get_active_user_student_parent_list, get_pending_mapping_requests, manage_parent_student_mapping, search_user_for_mapping
+from controllers.parents.add_parent_student_mapping import add_parent_student_mapping, create_and_map_dependent_profile, get_active_user_student_parent_list, get_invitation_all_summary, get_pending_mapping_requests, manage_parent_student_mapping, search_user_for_mapping
 from controllers.parents.get_teacher_dashboard import get_teacher_dashboard_assessments
 from controllers.parents.get_user_detils import get_academic_hierarchy
 from controllers.parents.student_notification_assessments import get_student_notification_assessments
@@ -357,6 +357,10 @@ def manage_parent_student_mapping_route():
 @app.route(USER_URL + '/get_pending_mapping_requests', methods=['GET'])
 def get_pending_mapping_requests_route():
     return get_pending_mapping_requests()
+
+@app.route(USER_URL + '/get_invitation_all_summary', methods=['GET'])
+def get_invitation_all_summary_route():
+    return get_invitation_all_summary()
  
 
 
