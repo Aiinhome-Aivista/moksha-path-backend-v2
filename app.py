@@ -89,6 +89,7 @@ from controllers.blogs.blog_controller import get_blogs, insert_update_blog, del
 from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo, delete_seo
 from controllers.blogs.dashboard_controller import admin_get_dashboard
 
+from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -192,6 +193,18 @@ def route_get_profile_image():
 @app.route(USER_URL + '/menu/page_acess', methods=["POST"])  # Changed from GET to POST
 def get_user_menu_route():
     return get_user_menu()
+
+@app.route(USER_URL +'/profile_info', methods=['GET'])
+def fetch_profile():
+    return get_user_profile()
+
+@app.route(USER_URL +'/update_profile', methods=['POST'])
+def save_profile():
+    return update_user_profile()
+
+@app.route(USER_URL +'/user_academic_info', methods=['GET'])
+def user_academic_details():
+    return get_academic_details()
 
 # --- ACADEMIC ROUTES ---
 @app.route(ACADEMIC_URL + '/get_user_academic_details_nodependices', methods=["GET"])
