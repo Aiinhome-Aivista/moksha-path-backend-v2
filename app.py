@@ -8,6 +8,7 @@ import sys
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
 from controllers.common.get_institute_hierarchy import get_institute_hierarchy
 from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
+from controllers.parents.add_parent_student_mapping import add_parent_student_mapping, create_and_map_dependent_profile, get_pending_mapping_requests, manage_parent_student_mapping, search_user_for_mapping
 from controllers.parents.get_teacher_dashboard import get_teacher_dashboard_assessments
 from controllers.parents.get_user_detils import get_academic_hierarchy
 from controllers.parents.student_notification_assessments import get_student_notification_assessments
@@ -205,6 +206,17 @@ def save_profile():
 @app.route(USER_URL +'/user_academic_info', methods=['GET'])
 def user_academic_details():
     return get_academic_details()
+@app.route(USER_URL + '/add_parent_student_mapping', methods=["POST"])  # Changed from GET to POST
+def add_parent_student_mapping_route():
+    return add_parent_student_mapping()
+
+@app.route(USER_URL + '/search_user_for_mapping', methods=["GET"])  # Changed from GET to POST
+def search_user_for_mapping_route():
+    return search_user_for_mapping()
+
+@app.route(USER_URL + '/create_and_map_dependent_profile', methods=["POST"])
+def create_and_map_dependent_profile_route():
+    return create_and_map_dependent_profile()
 
 # --- ACADEMIC ROUTES ---
 @app.route(ACADEMIC_URL + '/get_user_academic_details_nodependices', methods=["GET"])
@@ -333,6 +345,14 @@ def get_institute_hierarchy_route():
 def get_all_usernames_with_paginations_route():
     return get_all_usernames_with_paginations()
 
+@app.route(USER_URL + '/manage_parent_student_mapping', methods=['POST'])
+def manage_parent_student_mapping_route():
+    return manage_parent_student_mapping()
+
+@app.route(USER_URL + '/get_pending_mapping_requests', methods=['GET'])
+def get_pending_mapping_requests_route():
+    return get_pending_mapping_requests()
+ 
 
 
 # ==========================================
@@ -528,6 +548,8 @@ def add_profile_route():
 @app.route(AUTH_URL + '/get_users_by_token_contact', methods=["GET"])
 def get_users_by_token_contact_route():
     return get_users_by_token_contact()
+
+
 
 
 
