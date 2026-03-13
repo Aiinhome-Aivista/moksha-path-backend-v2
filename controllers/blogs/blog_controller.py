@@ -132,7 +132,6 @@ def delete_blog():
             conn.close()
 
 
-
 def get_public_blogs():
 
     conn=None
@@ -149,13 +148,15 @@ def get_public_blogs():
 
         if blogs:
             for blog in blogs:
-                if blog["image"]:
+
+                if blog.get("image"):
                     blog["image"]=f"{HOST_URL}/uploads/blogs/{blog['image']}"
 
         return api_response(
             message=result["p_msg"],
             code=result["p_status_code"],
-            data=blogs
+            data=blogs,
+            status="success" if result["p_status_code"]==200 else "error"
         )
 
     except Exception as e:
@@ -171,4 +172,4 @@ def get_public_blogs():
 
         if conn:
             cur.close()
-            conn.close()            
+            conn.close()
