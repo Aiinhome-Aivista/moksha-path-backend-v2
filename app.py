@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from config import get_db_connection
 import sys
@@ -82,6 +82,13 @@ from controllers.parents.parent_dashboard_controller import (
     get_parent_subjectwise_average_score, get_parent_student_subjects, get_parent_student_strength_weakness
 )
 from controllers.parents.get_parent_profile_details import get_parent_profile_details
+# Blogs Controllers
+from controllers.blogs.admin_login_controller import admin_login
+from controllers.blogs.category_controller import get_categories, insert_update_category, delete_category, get_category_dropdown
+from controllers.blogs.blog_controller import get_blogs, insert_update_blog, delete_blog, get_public_blogs
+from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo, delete_seo
+from controllers.blogs.dashboard_controller import admin_get_dashboard
+
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -104,6 +111,7 @@ AUTH_LOGIN_URL = '/api/v1/auth/login'
 SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
+BLOG_URL = '/api/v1/blogs'
 
 # ==========================================
 # 3. ROUTES
@@ -598,8 +606,66 @@ def parent_profile_route():
     return get_parent_profile_details()
 
 
+# Blogs Routes
+@app.route(BLOG_URL + '/admin-login', methods=['POST'])
+def login_route():
+    return admin_login()
 
-   
+@app.route(BLOG_URL + '/categories', methods=['GET'])
+def category_list_route():
+    return get_categories()
+
+
+@app.route(BLOG_URL + '/category/insert-update', methods=['POST'])
+def category_save_route():
+    return insert_update_category()
+
+
+@app.route(BLOG_URL + '/category/delete', methods=['POST'])
+def category_delete_route():
+    return delete_category()
+
+@app.route(BLOG_URL + '/category-dropdown', methods=['GET'])
+def category_dropdown_route():
+    return get_category_dropdown()
+
+@app.route(BLOG_URL + '/blogs', methods=['GET'])
+def blog_list_route():
+    return get_blogs()
+
+
+@app.route(BLOG_URL + '/blog/insert-update', methods=['POST'])
+def blog_save_route():
+    return insert_update_blog()
+
+
+@app.route(BLOG_URL + '/blog/delete', methods=['POST'])
+def blog_delete_route():
+    return delete_blog()
+
+@app.route(BLOG_URL + '/seo-settings', methods=['GET'])
+def seo_settings_route():
+    return get_seo_settings()
+
+@app.route(BLOG_URL + '/seo/insert-update', methods=['POST'])
+def seo_save_route():
+    return insert_update_seo()
+
+@app.route(BLOG_URL + '/seo/delete', methods=['POST'])
+def seo_delete_route():     
+    return delete_seo() 
+
+@app.route(BLOG_URL + '/admin-dashboard', methods=['GET'])
+def admin_dashboard_route():
+    return admin_get_dashboard()
+  
+@app.route(BLOG_URL + '/public-blogs',methods=['GET'])
+def public_blogs():
+    return get_public_blogs()
+
+@app.route('/uploads/blogs/<filename>')
+def blog_images(filename):
+    return send_from_directory('uploads/blogs', filename)
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
