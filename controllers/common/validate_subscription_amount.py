@@ -27,7 +27,9 @@ def validate_subscription_amount():
         plan_id = data.get("plan_id")
         board_id = data.get("board_id")
         class_id = data.get("class_id")
-        subject_ids = data.get("subject_ids")
+        # subject_ids = data.get("subject_ids")
+        
+        subject_ids = [int(x) for x in data.get("subject_ids", [])]
         ui_total_amount = data.get("ui_total_amount")
         total_licences = data.get("total_licences")
         
@@ -63,11 +65,7 @@ def validate_subscription_amount():
         # ============================================
         cur.execute("""
             CALL subscription.usp_v3_validate_subscription_amount(
-                %s, %s, %s, %s, %s, %s, 
-                %s, -- p_coupon_code (Passed here)
-                NULL,
-                NULL,
-                NULL
+                %s,%s,%s,%s::int[],%s,%s,%s,NULL,NULL,NULL
             )
         """, (
             plan_id,
