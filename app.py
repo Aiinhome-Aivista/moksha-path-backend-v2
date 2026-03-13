@@ -82,6 +82,7 @@ from controllers.parents.parent_dashboard_controller import (
     get_parent_subjectwise_average_score, get_parent_student_subjects, get_parent_student_strength_weakness
 )
 from controllers.parents.get_parent_profile_details import get_parent_profile_details
+from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -184,6 +185,18 @@ def route_get_profile_image():
 @app.route(USER_URL + '/menu/page_acess', methods=["POST"])  # Changed from GET to POST
 def get_user_menu_route():
     return get_user_menu()
+
+@app.route(USER_URL +'/profile_info', methods=['GET'])
+def fetch_profile():
+    return get_user_profile()
+
+@app.route(USER_URL +'/update_profile', methods=['POST'])
+def save_profile():
+    return update_user_profile()
+
+@app.route(USER_URL +'/user_academic_info', methods=['GET'])
+def user_academic_details():
+    return get_academic_details()
 
 # --- ACADEMIC ROUTES ---
 @app.route(ACADEMIC_URL + '/get_user_academic_details_nodependices', methods=["GET"])
