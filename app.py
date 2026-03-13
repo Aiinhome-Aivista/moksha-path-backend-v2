@@ -8,6 +8,7 @@ import sys
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
 from controllers.common.get_institute_hierarchy import get_institute_hierarchy
 from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
+from controllers.parents.add_parent_student_mapping import add_parent_student_mapping
 from controllers.parents.get_teacher_dashboard import get_teacher_dashboard_assessments
 from controllers.parents.get_user_detils import get_academic_hierarchy
 from controllers.parents.student_notification_assessments import get_student_notification_assessments
@@ -184,6 +185,10 @@ def route_get_profile_image():
 @app.route(USER_URL + '/menu/page_acess', methods=["POST"])  # Changed from GET to POST
 def get_user_menu_route():
     return get_user_menu()
+
+@app.route(USER_URL + '/add_parent_student_mapping', methods=["POST"])  # Changed from GET to POST
+def add_parent_student_mapping_route():
+    return add_parent_student_mapping()
 
 # --- ACADEMIC ROUTES ---
 @app.route(ACADEMIC_URL + '/get_user_academic_details_nodependices', methods=["GET"])
