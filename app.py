@@ -1,6 +1,6 @@
 import os
 import logging
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from config import get_db_connection
 import sys
@@ -8,6 +8,7 @@ import sys
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
 from controllers.common.get_institute_hierarchy import get_institute_hierarchy
 from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
+from controllers.parents.add_parent_student_mapping import add_parent_student_mapping, create_and_map_dependent_profile, get_active_user_student_parent_list, get_invitation_all_summary, get_pending_mapping_requests, manage_parent_student_mapping, search_user_for_mapping
 from controllers.parents.get_teacher_dashboard import get_teacher_dashboard_assessments
 from controllers.parents.get_user_detils import get_academic_hierarchy
 from controllers.parents.student_notification_assessments import get_student_notification_assessments
@@ -82,6 +83,13 @@ from controllers.parents.parent_dashboard_controller import (
     get_parent_subjectwise_average_score, get_parent_student_subjects, get_parent_student_strength_weakness
 )
 from controllers.parents.get_parent_profile_details import get_parent_profile_details
+# Blogs Controllers
+from controllers.blogs.admin_login_controller import admin_login
+from controllers.blogs.category_controller import get_categories, insert_update_category, delete_category, get_category_dropdown
+from controllers.blogs.blog_controller import get_blogs, insert_update_blog, delete_blog, get_public_blogs
+from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo, delete_seo
+from controllers.blogs.dashboard_controller import admin_get_dashboard
+
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
 # ==========================================
 # 1. SETUP & CONFIGURATION
@@ -105,6 +113,7 @@ AUTH_LOGIN_URL = '/api/v1/auth/login'
 SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
+BLOG_URL = '/api/v1/blogs'
 
 # ==========================================
 # 3. ROUTES
@@ -197,6 +206,22 @@ def save_profile():
 @app.route(USER_URL +'/user_academic_info', methods=['GET'])
 def user_academic_details():
     return get_academic_details()
+@app.route(USER_URL + '/add_parent_student_mapping', methods=["POST"])  # Changed from GET to POST
+def add_parent_student_mapping_route():
+    return add_parent_student_mapping()
+
+@app.route(USER_URL + '/search_user_for_mapping', methods=["GET"])  # Changed from GET to POST
+def search_user_for_mapping_route():
+    return search_user_for_mapping()
+
+@app.route(USER_URL + '/create_and_map_dependent_profile', methods=["POST"])
+def create_and_map_dependent_profile_route():
+    return create_and_map_dependent_profile()
+
+@app.route(USER_URL + '/get_active_user_student_parent_list', methods=["GET"])
+def get_active_user_student_parent_list_route():
+    return get_active_user_student_parent_list()
+
 
 # --- ACADEMIC ROUTES ---
 @app.route(ACADEMIC_URL + '/get_user_academic_details_nodependices', methods=["GET"])
@@ -325,6 +350,18 @@ def get_institute_hierarchy_route():
 def get_all_usernames_with_paginations_route():
     return get_all_usernames_with_paginations()
 
+@app.route(USER_URL + '/manage_parent_student_mapping', methods=['POST'])
+def manage_parent_student_mapping_route():
+    return manage_parent_student_mapping()
+
+@app.route(USER_URL + '/get_pending_mapping_requests', methods=['GET'])
+def get_pending_mapping_requests_route():
+    return get_pending_mapping_requests()
+
+@app.route(USER_URL + '/get_invitation_all_summary', methods=['GET'])
+def get_invitation_all_summary_route():
+    return get_invitation_all_summary()
+ 
 
 
 # ==========================================
@@ -529,6 +566,8 @@ def get_users_by_token_contact_route():
 
 
 
+
+
 # Teacher Dashboard Routes
 @app.route(PARENT_TEACHER_URL + '/dashboard/bucket-performance', methods=['GET'])
 def teacher_bucket_perf_route():
@@ -611,8 +650,66 @@ def parent_profile_route():
     return get_parent_profile_details()
 
 
+# Blogs Routes
+@app.route(BLOG_URL + '/admin-login', methods=['POST'])
+def login_route():
+    return admin_login()
 
-   
+@app.route(BLOG_URL + '/categories', methods=['GET'])
+def category_list_route():
+    return get_categories()
+
+
+@app.route(BLOG_URL + '/category/insert-update', methods=['POST'])
+def category_save_route():
+    return insert_update_category()
+
+
+@app.route(BLOG_URL + '/category/delete', methods=['POST'])
+def category_delete_route():
+    return delete_category()
+
+@app.route(BLOG_URL + '/category-dropdown', methods=['GET'])
+def category_dropdown_route():
+    return get_category_dropdown()
+
+@app.route(BLOG_URL + '/blogs', methods=['GET'])
+def blog_list_route():
+    return get_blogs()
+
+
+@app.route(BLOG_URL + '/blog/insert-update', methods=['POST'])
+def blog_save_route():
+    return insert_update_blog()
+
+
+@app.route(BLOG_URL + '/blog/delete', methods=['POST'])
+def blog_delete_route():
+    return delete_blog()
+
+@app.route(BLOG_URL + '/seo-settings', methods=['GET'])
+def seo_settings_route():
+    return get_seo_settings()
+
+@app.route(BLOG_URL + '/seo/insert-update', methods=['POST'])
+def seo_save_route():
+    return insert_update_seo()
+
+@app.route(BLOG_URL + '/seo/delete', methods=['POST'])
+def seo_delete_route():     
+    return delete_seo() 
+
+@app.route(BLOG_URL + '/admin-dashboard', methods=['GET'])
+def admin_dashboard_route():
+    return admin_get_dashboard()
+  
+@app.route(BLOG_URL + '/public-blogs',methods=['GET'])
+def public_blogs():
+    return get_public_blogs()
+
+@app.route('/uploads/blogs/<filename>')
+def blog_images(filename):
+    return send_from_directory('uploads/blogs', filename)
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
