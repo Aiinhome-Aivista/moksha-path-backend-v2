@@ -104,67 +104,7 @@ def start_assessment_attempt():
     except Exception as e:
         return api_response(message="Server Error", error=str(e), code=500, status="error")
 
-
-# def start_assessment_attempt():
-#     """
-#     POST /api/v1/assessment/start
-#     Body: { "assignment_id": 123 }
-#     """
-#     try:
-#         # 1. Get User Payload
-#         payload = TokenVerifier.get_user_payload()
-#         if not payload:
-#             return api_response(message="Unauthorized", code=401)
-            
-#         student_id = payload.get('sub') # This is often a string '107'
-
-#         # 2. Extract Subscription ID using Helper
-#         subscription_id = get_active_subscription(student_id)
-#         if not subscription_id:
-#              return api_response(message="Active Subscription ID not found for this user.", code=403, status="error")
-
-#         # 3. Get Request Data
-#         data = request.get_json()
-#         assignment_id = data.get('assignment_id')
-
-#         conn = get_db_connection()
-#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        
-#         try:
-#             # 4. Call Procedure with EXPLICIT CASTS
-#             cur.execute(
-#                 """
-#                 CALL learning.usp_v1_start_assessment_attempt(
-#                     %s::integer,   -- p_assignment_id
-#                     %s::integer,   -- p_student_id
-#                     %s::varchar,   -- p_subscription_id
-#                     0,             -- o_status
-#                     ''::text,      -- o_message
-#                     '{}'::jsonb    -- o_data
-#                 )
-#                 """, 
-#                 (assignment_id, student_id, subscription_id)
-#             )
-            
-#             res = cur.fetchone()
-#             conn.commit()
-            
-#             # Check response status
-#             if res['o_status'] == 200:
-#                 return api_response(message=res['o_message'], data=res['o_data'], code=200, status="success")
-#             else:
-#                 return api_response(message=res['o_message'], code=res['o_status'], status="error")
-
-#         except Exception as db_err:
-#             conn.rollback()
-#             return api_response(message="Database Error", error=str(db_err), code=500, status="error")
-#         finally:
-#             cur.close()
-#             conn.close()
-
-#     except Exception as e:
-#         return api_response(message="Server Error", error=str(e), code=500, status="error")
-
+ 
 # 3. Save Single Answer
 def save_single_answer():
     try:
@@ -212,38 +152,6 @@ def save_single_answer():
     except Exception as e:
         return api_response(message="Server Error", error=str(e), code=500)
  
-# # 4. Finish Assessment
-# def finish_assessment():
-#     try:
-#         # Get Student ID (User ID)
-#         student_id, error = TokenVerifier.get_user_id()
-#         if error: return api_response(message=error, code=401)
-
-#         data = request.get_json()
-#         attempt_id = data.get('attempt_id')
-
-#         if not attempt_id:
-#             return api_response(message="Attempt ID is required", code=400)
-
-#         conn = get_db_connection()
-#         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        
-#         try:
-#             # Call the updated procedure
-#             cur.execute(
-#                 "CALL learning.usp_v1_finish_assessment(%s, %s, 0, '', '{}')", 
-#                 (attempt_id, student_id)
-#             )
-#             res = cur.fetchone()
-#             conn.commit()
-            
-#             # The response will now contain score_obtained and total_marks
-#             return api_response(message=res['o_message'], data=res['o_data'], code=res['o_status'])
-#         finally:
-#             cur.close(); conn.close()
-#     except Exception as e:
-#         return api_response(message="Server Error", error=str(e), code=500)
-
 # 5. Submit Assessment Result (Alternative/Batch Submit)
 def submit_assessment_result():
     try:

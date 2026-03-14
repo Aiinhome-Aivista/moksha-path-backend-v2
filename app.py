@@ -17,6 +17,7 @@ from controllers.registration.add_profile import add_profile_v4
 from controllers.registration.get_students_list_by_academics import get_students_list_by_academics
 from controllers.registration.registration import   select_profile_v4, send_ui_otp_v4,verify_and_login_v4
 from controllers.students.assessment.finish_report_assessment import get_evaluation_dashboard, process_evaluation_data
+from controllers.students.assessment.new_assment_with_log.assment_save_single_answers_log import assment_save_single_answers_log
 from controllers.students.dashboart import get_main_dashboard
 from controllers.students.usp_v1_get_student_assessments import get_student_assessments_chapters_details
 sys.dont_write_bytecode = True
@@ -445,6 +446,10 @@ def submit_assessment_route():
 @app.route(LEARNING + '/assessment/save_answer', methods=["POST"])
 def save_single_answer_route():
     return save_single_answer()
+# New log lojic Save answers for assments
+@app.route(LEARNING + '/assessment/save_answer_with_log', methods=["POST"])
+def assment_save_single_answers_log_route():
+    return assment_save_single_answers_log()
 
 @app.route(LEARNING + '/assessment/finish', methods=["POST"])
 def finish_assessment_route():
