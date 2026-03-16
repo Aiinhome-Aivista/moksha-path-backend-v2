@@ -162,8 +162,14 @@ def manage_parent_student_mapping():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
+        # query = """
+        #     CALL common.sp_manage_parent_student_mapping(
+        #         %s::INTEGER, %s::INTEGER, %s::VARCHAR, 
+        #         NULL, NULL, NULL
+        #     )
+        # """
         query = """
-            CALL common.sp_manage_parent_student_mapping(
+            CALL common.sp_manage_parent_student_mapping_v2(
                 %s::INTEGER, %s::INTEGER, %s::VARCHAR, 
                 NULL, NULL, NULL
             )
@@ -250,8 +256,14 @@ def get_invitation_all_summary():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
+        # query = """
+        #     CALL common.usp_get_assigned_users_list_v1(
+        #         %s::INTEGER, 
+        #         NULL, NULL, NULL
+        #     )
+        # """
         query = """
-            CALL common.usp_get_assigned_users_list_v1(
+            CALL common.usp_get_assigned_users_list_v2(
                 %s::INTEGER, 
                 NULL, NULL, NULL
             )
