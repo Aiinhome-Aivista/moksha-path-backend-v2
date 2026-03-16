@@ -87,7 +87,7 @@ from controllers.parents.get_parent_profile_details import get_parent_profile_de
 # Blogs Controllers
 from controllers.blogs.admin_login_controller import admin_login
 from controllers.blogs.category_controller import get_categories, insert_update_category, delete_category, get_category_dropdown
-from controllers.blogs.blog_controller import get_blogs, insert_update_blog, delete_blog, get_public_blogs
+from controllers.blogs.blog_controller import get_blogs, insert_update_blog, delete_blog, get_public_blogs, UPLOAD_FOLDER
 from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo, delete_seo
 from controllers.blogs.dashboard_controller import admin_get_dashboard
 
@@ -714,7 +714,8 @@ def public_blogs():
 
 @app.route('/uploads/blogs/<filename>')
 def blog_images(filename):
-    return send_from_directory('uploads/blogs', filename)
+    return send_from_directory(UPLOAD_FOLDER, filename)
+# 'uploads/blogs'
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================

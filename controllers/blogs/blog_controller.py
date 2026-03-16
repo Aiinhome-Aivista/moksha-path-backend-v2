@@ -4,9 +4,10 @@ from utils.api_response import api_response
 import psycopg2.extras
 import os
 
-BASE_DIR = os.getcwd()
+# BASE_DIR = os.getcwd()
+# UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads", "blogs")
+BASE_DIR = "/home/site/wwwroot"
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads", "blogs")
-
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 def get_blogs():
