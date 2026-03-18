@@ -94,7 +94,7 @@ from controllers.blogs.dashboard_controller import admin_get_dashboard
 
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
 
-from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher
+from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -734,6 +734,14 @@ def institute_assign_teacher_route():
 @app.route(INSTITUTE_ADMIN_URL + '/remove_teacher', methods=["POST"])
 def institute_remove_teacher_route():
     return remove_teacher()
+
+@app.route(INSTITUTE_ADMIN_URL + '/assigned_teacher_list', methods=["GET"])
+def institute_get_teachers_route():
+    return get_assigned_teachers()
+
+@app.route(INSTITUTE_ADMIN_URL + '/available_teachers', methods=["GET"])
+def institute_get_available_teachers_route():
+    return get_available_teachers()
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
