@@ -92,6 +92,8 @@ from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo
 from controllers.blogs.dashboard_controller import admin_get_dashboard
 
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
+
+from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -115,7 +117,7 @@ SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
-
+INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
 # ==========================================
 # 3. ROUTES
 # ==========================================
@@ -716,6 +718,17 @@ def public_blogs():
 def blog_images(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 # 'uploads/blogs'
+
+# ==========================================
+# Institute Admin Routes
+# ==========================================
+@app.route(INSTITUTE_ADMIN_URL + '/assign_teacher', methods=["POST"])
+def institute_assign_teacher_route():
+    return assign_teacher()
+
+@app.route(INSTITUTE_ADMIN_URL + '/remove_teacher', methods=["POST"])
+def institute_remove_teacher_route():
+    return remove_teacher()
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================

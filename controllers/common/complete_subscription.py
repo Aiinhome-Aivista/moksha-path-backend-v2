@@ -215,8 +215,22 @@ def complete_subscription():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         # Call V3 Procedure
+        # cur.execute("""
+        # CALL subscription.usp_v3_complete_subscription(
+        #     %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
+        #     %s, 
+        #     NULL, -- p_subscription_code (OUT)
+        #     NULL, -- p_status (OUT)
+        #     NULL  -- p_message (OUT)
+        # )
+        # """, (
+        #     user_id, plan_id, board_id, class_id, institute_id, 
+        #     subject_ids, total_licenses, licenses_used, transaction_id, 
+        #     subscription_name, ui_total_amount, coupon_code
+        # ))
+        # Call V5 Procedure (with max_teachers logic)
         cur.execute("""
-        CALL subscription.usp_v3_complete_subscription(
+        CALL subscription.usp_v5_complete_subscription(
             %s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,
             %s, 
             NULL, -- p_subscription_code (OUT)
