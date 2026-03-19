@@ -196,8 +196,7 @@ def complete_subscription():
 
         coupon_code = data.get("coupon_code")
         currency = data.get("currency", "INR")
-
-        # ================= BASIC VALIDATION =================
+        payment_gateway = data.get("payment_gateway")        # ================= BASIC VALIDATION =================
         if not profiles or not isinstance(profiles, list):
             return api_response(
                 message="profiles required",
@@ -234,7 +233,7 @@ def complete_subscription():
             CALL subscription.usp_v3_complete_subscription_bulk(
                 %s, %s::jsonb, %s, %s,
                 %s, %s, %s,
-                %s, %s,
+                %s, %s, %s,
                 NULL, NULL, NULL
             )
         """, (
@@ -246,7 +245,8 @@ def complete_subscription():
             db_discount,
             db_final,
             coupon_code,
-            currency
+            currency,
+            payment_gateway
         ))
 
         result = cur.fetchone()
