@@ -93,8 +93,12 @@ from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo
 from controllers.blogs.dashboard_controller import admin_get_dashboard
 
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
+<<<<<<< HEAD
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
+=======
+from controllers.blogs.author_controller import get_authors
+>>>>>>> 9a1729a17f2d22a135516426429d6c17422c0bc6
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -718,6 +722,10 @@ def admin_dashboard_route():
 @app.route(BLOG_URL + '/public-blogs',methods=['GET'])
 def public_blogs():
     return get_public_blogs()
+
+@app.route(BLOG_URL + '/authors-dropdown', methods=['GET'])
+def author_list_route():
+    return get_authors()
 
 @app.route('/uploads/blogs/<filename>')
 def blog_images(filename):
