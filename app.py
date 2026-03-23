@@ -16,6 +16,7 @@ from controllers.parents.usp_v1_get_teacher_planner_get_dashboard import get_tea
 from controllers.registration.add_profile import add_profile_v4
 from controllers.registration.get_students_list_by_academics import get_students_list_by_academics
 from controllers.registration.registration import   select_profile_v4, send_ui_otp_v4,verify_and_login_v4
+from controllers.students.adaptive_assessment.finish_adaptive_assessment import finish_adaptive_assessment
 from controllers.students.adaptive_assessment.get_next_adaptive_question import get_next_adaptive_question
 from controllers.students.adaptive_assessment.create_adaptive_set import create_adaptive_set
 from controllers.students.adaptive_assessment.get_student_assessments import anddaptive_get_student_assessments
@@ -504,6 +505,10 @@ def get_next_adaptive_question_route():
 @app.route(LEARNING + '/assessment/save_adaptive_answer', methods=["POST"])
 def save_adaptive_answer_route():
     return save_adaptive_answer()
+
+@app.route(LEARNING + '/assessment/finish_adaptive', methods=["POST"])
+def finish_adaptive_assessment_route():
+    return finish_adaptive_assessment()
 
 
 
