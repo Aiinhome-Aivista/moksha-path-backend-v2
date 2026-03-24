@@ -2,8 +2,11 @@ from flask import request
 from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
+from utils.posthog_helper import send_event_to_posthog
+
 import psycopg2.extras
 import json
+import threading
 
 
 def log_user_activity():
@@ -11,25 +14,28 @@ def log_user_activity():
     conn = None
 
     try:
-
         # AUTH
         user_id_str, auth_error = TokenVerifier.get_user_id()
 
         if not user_id_str:
             return api_response(
-                message="Unauthorized", code=401, status="error", error=auth_error
+                message="Unauthorized",
+                code=401,
+                status="error",
+                error=auth_error
             )
 
         # INPUT
         data = request.get_json() or {}
 
         event_name = data.get("event_name")
-
         event_data = data.get("event_data")
 
         if not event_name:
             return api_response(
-                message="event_name is required", code=400, status="error"
+                message="event_name is required",
+                code=400,
+                status="error"
             )
 
         # DB CALL
@@ -39,24 +45,25 @@ def log_user_activity():
 
         cur.execute(
             """
-
             CALL analytics.usp_v1_insert_user_event(
-
                 %s,
                 %s,
                 %s::jsonb,
-
                 NULL,
                 NULL,
                 NULL
-
             )
-
-        """,
+            """,
             (user_id_str, event_name, json.dumps(event_data)),
         )
 
         result = cur.fetchone()
+
+        # PostHog (ASYNC - IMPORTANT)
+        threading.Thread(
+            target=send_event_to_posthog,
+            args=(user_id_str, event_name, event_data)
+        ).start()
 
         # RESPONSE
         return api_response(
@@ -67,12 +74,13 @@ def log_user_activity():
         )
 
     except Exception as e:
-
         return api_response(
-            message="Internal Server Error", code=500, status="error", error=str(e)
+            message="Internal Server Error",
+            code=500,
+            status="error",
+            error=str(e)
         )
 
     finally:
-
         if conn:
             conn.close()
