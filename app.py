@@ -101,7 +101,10 @@ from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo
 from controllers.blogs.dashboard_controller import admin_get_dashboard
 
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
+
+from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
+from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -125,7 +128,7 @@ SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
-
+INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
 # ==========================================
 # 3. ROUTES
 # ==========================================
@@ -767,6 +770,29 @@ def author_list_route():
 def blog_images(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 # 'uploads/blogs'
+
+# ==========================================
+# Institute Admin Routes
+# ==========================================
+@app.route(INSTITUTE_ADMIN_URL + '/assign_teacher', methods=["POST"])
+def institute_assign_teacher_route():
+    return assign_teacher()
+
+@app.route(INSTITUTE_ADMIN_URL + '/remove_teacher', methods=["POST"])
+def institute_remove_teacher_route():
+    return remove_teacher()
+
+@app.route(INSTITUTE_ADMIN_URL + '/assigned_teacher_list', methods=["GET"])
+def institute_get_teachers_route():
+    return get_assigned_teachers()
+
+@app.route(INSTITUTE_ADMIN_URL + '/available_teachers', methods=["GET"])
+def institute_get_available_teachers_route():
+    return get_available_teachers()
+
+@app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
+def bulk_upload_teachers_route():
+    return bulk_upload_teachers()
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================

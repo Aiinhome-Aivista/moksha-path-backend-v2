@@ -80,7 +80,7 @@ def respond_invite_username():
         conn.autocommit = True
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        cur.execute("CALL subscription.sp_respond_to_subscription_invite(%s, %s, %s, NULL, NULL)", 
+        cur.execute("CALL subscription.sp_respond_to_subscription_invite_v1(%s, %s, %s, NULL, NULL)", 
                     (user_id, token, action))
         result = cur.fetchone()
 
