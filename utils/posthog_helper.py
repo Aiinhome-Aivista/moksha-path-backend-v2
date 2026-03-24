@@ -1,7 +1,12 @@
+import os
 import requests
+from dotenv import load_dotenv
 
-POSTHOG_API_KEY = "phc_QTG3Kz6La1BL28536wugnIF3XduwvYNh6pVuhGUZN0F"
-POSTHOG_URL = "https://app.posthog.com/capture/"
+# Load environment variables from .env
+load_dotenv()
+
+POSTHOG_API_KEY = os.getenv("POSTHOG_API_KEY")
+POSTHOG_URL = os.getenv("POSTHOG_URL")
 
 def send_event_to_posthog(user_id, event_name, event_data):
     try:
