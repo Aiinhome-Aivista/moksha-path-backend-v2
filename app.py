@@ -96,6 +96,7 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
+from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -747,6 +748,10 @@ def institute_get_teachers_route():
 @app.route(INSTITUTE_ADMIN_URL + '/available_teachers', methods=["GET"])
 def institute_get_available_teachers_route():
     return get_available_teachers()
+
+@app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
+def bulk_upload_teachers_route():
+    return bulk_upload_teachers()
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
