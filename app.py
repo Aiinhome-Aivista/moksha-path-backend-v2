@@ -20,6 +20,7 @@ from controllers.students.adaptive_assessment.finish_adaptive_assessment import 
 from controllers.students.adaptive_assessment.get_next_adaptive_question import get_next_adaptive_question
 from controllers.students.adaptive_assessment.create_adaptive_set import create_adaptive_set
 from controllers.students.adaptive_assessment.get_student_assessments import anddaptive_get_student_assessments
+from controllers.students.adaptive_assessment.retake_details import get_retake_details
 from controllers.students.adaptive_assessment.save_adaptive_answer import save_adaptive_answer
 from controllers.students.adaptive_assessment.start_assessment import addaptive_start_assessment
 from controllers.students.assessment.finish_report_assessment import get_evaluation_dashboard, process_evaluation_data
@@ -510,6 +511,10 @@ def save_adaptive_answer_route():
 def finish_adaptive_assessment_route():
     return finish_adaptive_assessment()
 
+@app.route(LEARNING + '/assessment/retake_details', methods=["POST"])
+def get_retake_details_route():
+    return get_retake_details()
+ 
 
 
 

@@ -10,7 +10,7 @@ def create_adaptive_set():
     conn = None
     try:
         # =========================================================================
-        # 1. AUTHENTICATION (Main User Token)
+        # 1. AUTHENTICATION (Main User Token) quction will be set 2.5 basis
         # =========================================================================
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
