@@ -93,6 +93,7 @@ from controllers.blogs.dashboard_controller import admin_get_dashboard
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
 from controllers.blogs.author_controller import get_authors
 from controllers.analytics.user_activity_log_controller import log_user_activity
+from controllers.analytics.log_activity_controller import log_activity
 
 # ==========================================
 # 1. SETUP & CONFIGURATION
@@ -117,7 +118,8 @@ SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
-ANALYTICS_URL = "/api/v1/log"
+# ANALYTICS_URL = "/api/v1/log"
+ANALYTICS_URL = "/api/v1/analytics"
 
 # ==========================================
 # 3. ROUTES
@@ -706,6 +708,12 @@ def blog_images(filename):
 @app.route(ANALYTICS_URL + "/user-events", methods=["POST"])
 def log_user_activity_route():
     return log_user_activity()
+
+
+# Analytics Routes
+@app.route(ANALYTICS_URL + "/log_activity", methods=["POST"])
+def log_activity_route():
+    return log_activity()
 
 
 # 'uploads/blogs'
