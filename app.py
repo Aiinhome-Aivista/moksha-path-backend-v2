@@ -29,6 +29,8 @@ from controllers.students.assessment.new_assment_with_log.assment_save_single_an
 from controllers.students.assessment.new_assment_with_log.attempt_controller_with_log import finish_assessment_with_log
 from controllers.students.dashboart import get_main_dashboard
 from controllers.students.usp_v1_get_student_assessments import get_student_assessments_chapters_details
+from controllers.study_meterial.get_study_meterial import get_study_material
+from controllers.study_meterial.upload_study_meterial import upload_study_material
 sys.dont_write_bytecode = True
 
 
@@ -131,8 +133,8 @@ ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
 # ANALYTICS_URL = "/api/v1/log"
 ANALYTICS_URL = "/api/v1/analytics"
-
 INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
+
 # ==========================================
 # 3. ROUTES
 # ==========================================
@@ -462,7 +464,7 @@ def assment_save_single_answers_log_route():
 @app.route(LEARNING + '/assessment/finish', methods=["POST"])
 def finish_assessment_route():
     return finish_assessment()
-#finish_with_log
+# finish_with_log
 @app.route(LEARNING + '/assessment/finish_with_log', methods=["POST"])
 def finish_assessment_with_log_route():
     return finish_assessment_with_log()
@@ -496,7 +498,7 @@ def anddaptive_get_student_assessments_route():
 @app.route(LEARNING + '/assessment/addaptive_start', methods=["POST"])
 def addaptive_start_assessment_route():
     return addaptive_start_assessment()
- 
+
 @app.route(LEARNING + '/assessment/get_next_question', methods=["GET"])
 def get_next_adaptive_question_route():
     return get_next_adaptive_question()
@@ -516,8 +518,8 @@ def get_retake_details_route():
 @app.route(LEARNING + '/assessment/start_adaptive_retake', methods=["POST"])
 def start_adaptive_retake_route():
     return start_adaptive_retake()
- 
- 
+
+
 # 1. Trigger Data Processing (Batch Job)
 @app.route(LEARNING + '/evaluation/process', methods=["POST"])
 def process_evaluation_route():
@@ -785,6 +787,18 @@ def institute_get_teachers_route():
 @app.route(INSTITUTE_ADMIN_URL + '/available_teachers', methods=["GET"])
 def institute_get_available_teachers_route():
     return get_available_teachers()
+
+
+@app.route(PARENT_TEACHER_URL + "/upload_study_material", methods=["POST"])
+def upload_study_material_route():
+    return upload_study_material()
+
+
+@app.route(PARENT_TEACHER_URL + "/get_study_material", methods=["GET"])
+def get_study_material_route():
+    return get_study_material()
+
+
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
