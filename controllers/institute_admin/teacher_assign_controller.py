@@ -304,7 +304,7 @@ def get_available_teachers():
         
         # Call the SP (2 inputs + 3 outputs = 5 parameters)
         cur.execute("""
-            CALL common.usp_institute_get_available_teachers(%s, %s, NULL, NULL, NULL)
+            CALL common.usp_v1_institute_get_available_teachers(%s, %s, NULL, NULL, NULL)
         """, (admin_user_id, admin_subscription_id))
         
         result = cur.fetchone()

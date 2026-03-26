@@ -105,6 +105,7 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
 from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
+from newcontroller.upsert_teacher_chapter_planner import upsert_teacher_chapter_planner,get_institute_admin_summary
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -704,6 +705,15 @@ def get_parent_student_strength_weakness_route():
 def parent_profile_route():
     return get_parent_profile_details()
 
+@app.route(PARENT_TEACHER_URL + '/teacher_chapter_planner_upsert', methods=['POST'])
+def upsert_teacher_chapter_planner_route(): 
+    return upsert_teacher_chapter_planner()
+
+@app.route(PARENT_TEACHER_URL + '/institute_admin_summary', methods=['GET'])
+def get_institute_admin_summary_route():        
+    return get_institute_admin_summary()
+
+
 
 # Blogs Routes
 @app.route(BLOG_URL + '/admin-login', methods=['POST'])
@@ -793,6 +803,8 @@ def institute_get_available_teachers_route():
 @app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
 def bulk_upload_teachers_route():
     return bulk_upload_teachers()
+
+
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
