@@ -115,8 +115,8 @@ def get_academic_details():
         user_id = int(token_payload.get('sub'))
         subscription_id = token_payload.get('subscription_id') or token_payload.get('sub_id')
 
-        if not subscription_id:
-            return api_response(message="No active subscription found for this profile.", code=404, status="error")
+        # if not subscription_id:
+        #     return api_response(message="No active subscription found for this profile.", code=404, status="error")
 
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
