@@ -8,6 +8,7 @@ import sys
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
 from controllers.common.get_institute_hierarchy import get_institute_hierarchy
 from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
+from controllers.institute_admin.get_assessment_subjects_summary import get_institute_admin_summary
 from controllers.parents.add_parent_student_mapping import add_parent_student_mapping, create_and_map_dependent_profile, get_active_user_student_parent_list, get_invitation_all_summary, get_pending_mapping_requests, manage_parent_student_mapping, search_user_for_mapping
 from controllers.parents.get_teacher_dashboard import get_teacher_dashboard_assessments
 from controllers.parents.get_user_detils import get_academic_hierarchy
@@ -589,7 +590,9 @@ def get_student_notification_assessments_route():
 
 
 
-
+@app.route(AUTH_URL + '/learning/subjects_summary', methods=['GET'])
+def get_institute_admin_summary_route():
+    return get_institute_admin_summary()
 
 @app.route(AUTH_URL + '/send_ui_otp_v4', methods=["POST"])
 def send_ui_otp_v4_route():
