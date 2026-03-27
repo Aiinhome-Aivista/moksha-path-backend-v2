@@ -103,6 +103,9 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
+from controllers.analytics.user_activity_log_controller import log_user_activity
+from controllers.analytics.log_activity_controller import log_activity
+
 from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, get_student_planner_dashboard
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
@@ -133,6 +136,7 @@ LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
 INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
+ANALYTICS_URL = "/api/v1/analytics"
 # ==========================================
 # 3. ROUTES
 # ==========================================
@@ -568,15 +572,12 @@ def get_student_subjects_list():
 def student_strength_weakness_route():
     return get_student_strength_weakness()
 
-<<<<<<< HEAD
-=======
 @app.route(LEARNING + '/student_planner_dashboard', methods=['GET'])
 def student_planner_dashboard_route():
     return get_student_planner_dashboard()
 
 
 #Newly added routes can be placed here following the same pattern.#
->>>>>>> 4a47d4a3e93d64b8d2c2f72e9641c48c539badeb
 # Newly added routes can be placed here following the same pattern.#
 @app.route(AUTH_URL + '/get_academic_hierarchy', methods=["GET"])
 def get_academic_hierarchy_route():
