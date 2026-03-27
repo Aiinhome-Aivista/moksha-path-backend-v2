@@ -16,8 +16,17 @@ from controllers.parents.usp_v1_get_teacher_planner_get_dashboard import get_tea
 from controllers.registration.add_profile import add_profile_v4
 from controllers.registration.get_students_list_by_academics import get_students_list_by_academics
 from controllers.registration.registration import   select_profile_v4, send_ui_otp_v4,verify_and_login_v4
+from controllers.students.adaptive_assessment.finish_adaptive_assessment import finish_adaptive_assessment
+from controllers.students.adaptive_assessment.get_next_adaptive_question import get_next_adaptive_question
+from controllers.students.adaptive_assessment.create_adaptive_set import create_adaptive_set
+from controllers.students.adaptive_assessment.get_student_assessments import anddaptive_get_student_assessments
+from controllers.students.adaptive_assessment.retake_details import get_retake_details
+from controllers.students.adaptive_assessment.save_adaptive_answer import save_adaptive_answer
+from controllers.students.adaptive_assessment.start_assessment import addaptive_start_assessment
+from controllers.students.adaptive_assessment.usp_get_addaptive_retake_questions import   start_adaptive_retake
 from controllers.students.assessment.finish_report_assessment import get_evaluation_dashboard, process_evaluation_data
 from controllers.students.assessment.new_assment_with_log.assment_save_single_answers_log import assment_save_single_answers_log
+from controllers.students.assessment.new_assment_with_log.attempt_controller_with_log import finish_assessment_with_log
 from controllers.students.dashboart import get_main_dashboard
 from controllers.students.usp_v1_get_student_assessments import get_student_assessments_chapters_details
 sys.dont_write_bytecode = True
@@ -91,10 +100,11 @@ from controllers.blogs.seo_controller import get_seo_settings, insert_update_seo
 from controllers.blogs.dashboard_controller import admin_get_dashboard
 
 from controllers.common.user_profile_details import get_user_profile, update_user_profile, get_academic_details
-from controllers.blogs.author_controller import get_authors
-from controllers.analytics.user_activity_log_controller import log_user_activity
-from controllers.analytics.log_activity_controller import log_activity
 
+from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
+from controllers.blogs.author_controller import get_authors
+from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -118,9 +128,7 @@ SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
-# ANALYTICS_URL = "/api/v1/log"
-ANALYTICS_URL = "/api/v1/analytics"
-
+INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
 # ==========================================
 # 3. ROUTES
 # ==========================================
@@ -450,6 +458,10 @@ def assment_save_single_answers_log_route():
 @app.route(LEARNING + '/assessment/finish', methods=["POST"])
 def finish_assessment_route():
     return finish_assessment()
+#finish_with_log
+@app.route(LEARNING + '/assessment/finish_with_log', methods=["POST"])
+def finish_assessment_with_log_route():
+    return finish_assessment_with_log()
 
 @app.route(LEARNING + '/teacher/assign_assessment', methods=["POST"])
 def teacher_assign_assessment_route():
@@ -468,7 +480,40 @@ def retake_assessment_route():
 def get_students_list_by_academics_route():
     return get_students_list_by_academics()
 
+#  Addaptive quction test
+@app.route(LEARNING + '/assessment/create_adaptive_set', methods=["POST"])
+def create_adaptive_set_route():
+    return create_adaptive_set()
 
+@app.route(LEARNING + '/assessment/student_assessments', methods=["GET"])
+def anddaptive_get_student_assessments_route():
+    return anddaptive_get_student_assessments()
+
+@app.route(LEARNING + '/assessment/addaptive_start', methods=["POST"])
+def addaptive_start_assessment_route():
+    return addaptive_start_assessment()
+ 
+@app.route(LEARNING + '/assessment/get_next_question', methods=["GET"])
+def get_next_adaptive_question_route():
+    return get_next_adaptive_question()
+
+@app.route(LEARNING + '/assessment/save_adaptive_answer', methods=["POST"])
+def save_adaptive_answer_route():
+    return save_adaptive_answer()
+
+@app.route(LEARNING + '/assessment/finish_adaptive', methods=["POST"])
+def finish_adaptive_assessment_route():
+    return finish_adaptive_assessment()
+
+@app.route(LEARNING + '/assessment/retake_details', methods=["POST"])
+def get_retake_details_route():
+    return get_retake_details()
+
+@app.route(LEARNING + '/assessment/start_adaptive_retake', methods=["POST"])
+def start_adaptive_retake_route():
+    return start_adaptive_retake()
+ 
+ 
 # 1. Trigger Data Processing (Batch Job)
 @app.route(LEARNING + '/evaluation/process', methods=["POST"])
 def process_evaluation_route():
@@ -637,6 +682,19 @@ def get_parent_student_strength_weakness_route():
 def parent_profile_route():
     return get_parent_profile_details()
 
+@app.route(PARENT_TEACHER_URL + '/teacher_chapter_planner_upsert', methods=['POST'])
+def upsert_teacher_chapter_planner_route(): 
+    return upsert_teacher_chapter_planner()
+
+@app.route(PARENT_TEACHER_URL + '/institute_admin_summary', methods=['GET'])
+def get_institute_admin_summary_route():        
+    return get_institute_admin_summary()
+
+@app.route(PARENT_TEACHER_URL + '/teacher_planner_data', methods=['GET'])
+def get_teacher_planer_data_route():
+    return get_teacher_planer_data()
+
+
 
 # Blogs Routes
 @app.route(BLOG_URL + '/admin-login', methods=['POST'])
@@ -717,6 +775,31 @@ def log_activity_route():
 
 
 # 'uploads/blogs'
+
+# ==========================================
+# Institute Admin Routes
+# ==========================================
+@app.route(INSTITUTE_ADMIN_URL + '/assign_teacher', methods=["POST"])
+def institute_assign_teacher_route():
+    return assign_teacher()
+
+@app.route(INSTITUTE_ADMIN_URL + '/remove_teacher', methods=["POST"])
+def institute_remove_teacher_route():
+    return remove_teacher()
+
+@app.route(INSTITUTE_ADMIN_URL + '/assigned_teacher_list', methods=["GET"])
+def institute_get_teachers_route():
+    return get_assigned_teachers()
+
+@app.route(INSTITUTE_ADMIN_URL + '/available_teachers', methods=["GET"])
+def institute_get_available_teachers_route():
+    return get_available_teachers()
+
+@app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
+def bulk_upload_teachers_route():
+    return bulk_upload_teachers()
+
+
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
