@@ -32,7 +32,6 @@ from controllers.students.usp_v1_get_student_assessments import get_student_asse
 sys.dont_write_bytecode = True
 
 
-
 # Import Controllers
 from controllers.common.forgot_user.forgot_username_email import   get_user_details, recover_username_send_otp, recover_username_verify
 from controllers.common.get_save_academic_details.get_rolesname import get_all_roles
@@ -104,7 +103,9 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
-from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
+from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
+
+
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data
 # ==========================================
 # 1. SETUP & CONFIGURATION
@@ -141,7 +142,6 @@ def health():
 # @app.route(ROOT_URL + '/register', methods=['POST'])
 # def register_route():
 #     return register_user()
-
 
 
 @app.route(SUBCRIPTION_URL + '/validate', methods=['POST'])
@@ -196,7 +196,7 @@ def undo_invite_route():
 def get_user_subscriptions_route():
     return get_user_subscriptions_list()
 
-#==== --- Base Url=== 
+# ==== --- Base Url===
 @app.route(USER_URL + '/profile_image/upload', methods=['POST'])
 def route_upload_profile_image():
     return upload_profile_image()
@@ -271,7 +271,6 @@ def get_user_academic_details_route():
 # --- AUTH ROUTES ---
 
 
-
 @app.route(AUTH_LOGIN_URL + '/send_otp', methods=["POST"])
 def login_send_otp_route():
     return login_send_ui_otp()
@@ -287,10 +286,6 @@ def login_logn_route():
 @app.route(AUTH_LOGIN_URL + '/logout', methods=["POST"])
 def login_logout_user_route():
     return login_logout_user()
-
-
-
-
 
 
 @app.route(AUTH_URL + '/roles', methods=["GET"])
@@ -322,7 +317,6 @@ def recover_verify_otp_route():
 @app.route(AUTH_URL + '/find_details', methods=["POST"])
 def find_details_route():
     return get_user_details()
-
 
 
 @app.route(AUTH_URL + '/decode_token', methods=["POST"])
@@ -376,7 +370,6 @@ def get_pending_mapping_requests_route():
 @app.route(USER_URL + '/get_invitation_all_summary', methods=['GET'])
 def get_invitation_all_summary_route():
     return get_invitation_all_summary()
- 
 
 
 # ==========================================
@@ -395,7 +388,6 @@ def generate_auto_plan_route():
 def update_study_hours_route():
     return update_study_hours()
 
- 
 
 @app.route(LEARNING + '/student/get_main_dashboard', methods=["GET"])
 def get_main_dashboard_route():
@@ -412,7 +404,7 @@ def get_teacher_learning_planner_dashboard_route():
 @app.route(LEARNING + '/student/update_topic_status', methods=["POST"])
 def update_topic_status_route():
     return update_topic_status()  
- 
+
 @app.route(LEARNING + '/student/update_priority', methods=["POST"])
 def update_priority_route():
     return update_priority() 
@@ -443,7 +435,7 @@ def get_student_assessments_route():
 @app.route(LEARNING + '/student/get_student_assessments_chapters_details', methods=["GET"])
 def get_student_assessments_chapters_details_route():
     return get_student_assessments_chapters_details()
- 
+
 
 @app.route(LEARNING + '/assessment/details', methods=["GET"])
 def get_assessment_details_route():
@@ -468,7 +460,7 @@ def assment_save_single_answers_log_route():
 @app.route(LEARNING + '/assessment/finish', methods=["POST"])
 def finish_assessment_route():
     return finish_assessment()
-#finish_with_log
+# finish_with_log
 @app.route(LEARNING + '/assessment/finish_with_log', methods=["POST"])
 def finish_assessment_with_log_route():
     return finish_assessment_with_log()
@@ -484,7 +476,6 @@ def teacher_assign_class_assessment_route():
 @app.route(LEARNING + '/assessment/retake', methods=["POST"])
 def retake_assessment_route():
     return retake_assessment()
-
 
 
 @app.route(LEARNING + '/get_students_list_by_academics', methods=["GET"])
@@ -503,7 +494,7 @@ def anddaptive_get_student_assessments_route():
 @app.route(LEARNING + '/assessment/addaptive_start', methods=["POST"])
 def addaptive_start_assessment_route():
     return addaptive_start_assessment()
- 
+
 @app.route(LEARNING + '/assessment/get_next_question', methods=["GET"])
 def get_next_adaptive_question_route():
     return get_next_adaptive_question()
@@ -523,8 +514,8 @@ def get_retake_details_route():
 @app.route(LEARNING + '/assessment/start_adaptive_retake', methods=["POST"])
 def start_adaptive_retake_route():
     return start_adaptive_retake()
- 
- 
+
+
 # 1. Trigger Data Processing (Batch Job)
 @app.route(LEARNING + '/evaluation/process', methods=["POST"])
 def process_evaluation_route():
@@ -575,7 +566,7 @@ def get_student_subjects_list():
 def student_strength_weakness_route():
     return get_student_strength_weakness()
 
-#Newly added routes can be placed here following the same pattern.#
+# Newly added routes can be placed here following the same pattern.#
 @app.route(AUTH_URL + '/get_academic_hierarchy', methods=["GET"])
 def get_academic_hierarchy_route():
     return get_academic_hierarchy()
@@ -589,13 +580,10 @@ def get_student_notification_assessments_route():
     return get_student_notification_assessments()
 
 
-
-
-
 @app.route(AUTH_URL + '/send_ui_otp_v4', methods=["POST"])
 def send_ui_otp_v4_route():
     return send_ui_otp_v4()
- 
+
 
 @app.route(AUTH_URL + '/verify_account', methods=["POST"])
 def verify_account_get_profiles_route():
@@ -613,15 +601,6 @@ def add_profile_route():
 @app.route(AUTH_URL + '/get_users_by_token_contact', methods=["GET"])
 def get_users_by_token_contact_route():
     return get_users_by_token_contact()
-
-
-
-
-
-
-
-
-
 
 
 # Teacher Dashboard Routes
@@ -718,7 +697,6 @@ def get_teacher_planer_data_route():
     return get_teacher_planer_data()
 
 
-
 # Blogs Routes
 @app.route(BLOG_URL + '/admin-login', methods=['POST'])
 def login_route():
@@ -771,7 +749,7 @@ def seo_delete_route():
 @app.route(BLOG_URL + '/admin-dashboard', methods=['GET'])
 def admin_dashboard_route():
     return admin_get_dashboard()
-  
+
 @app.route(BLOG_URL + '/public-blogs',methods=['GET'])
 def public_blogs():
     return get_public_blogs()
@@ -804,9 +782,14 @@ def institute_get_teachers_route():
 def institute_get_available_teachers_route():
     return get_available_teachers()
 
-@app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
+# @app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
+# def bulk_upload_teachers_route():
+#     return bulk_upload_teachers()
+
+
+@app.route(INSTITUTE_ADMIN_URL + "/bulk_upload_users", methods=["POST"])
 def bulk_upload_teachers_route():
-    return bulk_upload_teachers()
+    return bulk_upload_users_controller_v2()
 
 
 # ==========================================
