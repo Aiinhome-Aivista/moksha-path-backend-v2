@@ -123,7 +123,7 @@ def get_academic_details():
         
         # 2. Call the SP (Passing 2 inputs + 8 NULLs for outputs = 10 total)
         cur.execute("""
-            CALL common.usp_get_academic_details(
+            CALL public.usp_get_academic_details(
                 %s, %s, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL
             )
         """, (user_id, subscription_id))

@@ -105,6 +105,8 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
+from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, get_student_planner_dashboard
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 
 
@@ -571,6 +573,12 @@ def get_student_subjects_list():
 def student_strength_weakness_route():
     return get_student_strength_weakness()
 
+@app.route(LEARNING + '/student_planner_dashboard', methods=['GET'])
+def student_planner_dashboard_route():
+    return get_student_planner_dashboard()
+
+
+#Newly added routes can be placed here following the same pattern.#
 # Newly added routes can be placed here following the same pattern.#
 @app.route(AUTH_URL + '/get_academic_hierarchy', methods=["GET"])
 def get_academic_hierarchy_route():
@@ -818,6 +826,8 @@ def get_study_material_route():
 @app.route(INSTITUTE_ADMIN_URL + "/bulk_upload_users", methods=["POST"])
 def bulk_upload_teachers_route():
     return bulk_upload_users_controller_v2()
+
+
 
 
 # ==========================================
