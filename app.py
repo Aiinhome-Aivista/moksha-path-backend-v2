@@ -568,16 +568,13 @@ def get_student_subjects_list():
 def student_strength_weakness_route():
     return get_student_strength_weakness()
 
-<<<<<<< HEAD
 @app.route(LEARNING + '/student_planner_dashboard', methods=['GET'])
 def student_planner_dashboard_route():
     return get_student_planner_dashboard()
 
 
 #Newly added routes can be placed here following the same pattern.#
-=======
 # Newly added routes can be placed here following the same pattern.#
->>>>>>> db7d30cd7afd0f1e8e129da3d6c6fa1f984bc6ba
 @app.route(AUTH_URL + '/get_academic_hierarchy', methods=["GET"])
 def get_academic_hierarchy_route():
     return get_academic_hierarchy()
