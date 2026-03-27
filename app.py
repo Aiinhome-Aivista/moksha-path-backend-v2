@@ -105,9 +105,10 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
-from controllers.analytics.user_activity_log_controller import log_user_activity
-from controllers.analytics.log_activity_controller import log_activity
+from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 
+
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -688,6 +689,18 @@ def get_parent_student_strength_weakness_route():
 def parent_profile_route():
     return get_parent_profile_details()
 
+@app.route(PARENT_TEACHER_URL + '/teacher_chapter_planner_upsert', methods=['POST'])
+def upsert_teacher_chapter_planner_route(): 
+    return upsert_teacher_chapter_planner()
+
+@app.route(PARENT_TEACHER_URL + '/institute_admin_summary', methods=['GET'])
+def get_institute_admin_summary_route():        
+    return get_institute_admin_summary()
+
+@app.route(PARENT_TEACHER_URL + '/teacher_planner_data', methods=['GET'])
+def get_teacher_planer_data_route():
+    return get_teacher_planer_data()
+
 
 # Blogs Routes
 @app.route(BLOG_URL + '/admin-login', methods=['POST'])
@@ -797,6 +810,14 @@ def upload_study_material_route():
 @app.route(PARENT_TEACHER_URL + "/get_study_material", methods=["GET"])
 def get_study_material_route():
     return get_study_material()
+# @app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
+# def bulk_upload_teachers_route():
+#     return bulk_upload_teachers()
+
+
+@app.route(INSTITUTE_ADMIN_URL + "/bulk_upload_users", methods=["POST"])
+def bulk_upload_teachers_route():
+    return bulk_upload_users_controller_v2()
 
 
 # ==========================================
