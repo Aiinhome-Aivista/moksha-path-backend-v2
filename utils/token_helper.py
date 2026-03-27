@@ -180,6 +180,46 @@ class TokenVerifier:
             print(f"Token Error: {str(e)}")
             return None
 
+    @staticmethod
+    def verify_admin_tokens():
+        """
+        Extracts and verifies both auth token and subscription token for admins from headers.
+        Returns: (admin_user_id, admin_subscription_id, error_message)
+        """
+        # 1. Main Auth Token
+        user_id_str, auth_error = TokenVerifier.get_user_id()
+        if not user_id_str:
+            return None, None, auth_error
+            
+        admin_user_id = int(user_id_str)
+
+        # 2. Subscription Token
+        sub_token = request.headers.get('Subscription-Token') or request.headers.get('X-Subscription-Token')
+        if not sub_token:
+            return admin_user_id, None, "Subscription Token is missing in headers"
+
+        if "Bearer " in sub_token:
+            sub_token = sub_token.split(" ")[1]
+
+        if len(sub_token.split('.')) != 3:
+            return admin_user_id, None, "FRONTEND ERROR: Pass the long JWT Subscription Token, not the SUB-XXX string."
+
+        try:
+            sub_payload = jwt.decode(sub_token, JWT_SECRET, algorithms=["HS256"])
+            admin_subscription_id = sub_payload.get("subscription_id") or sub_payload.get("sub_id")
+            
+            if not admin_subscription_id:
+                return admin_user_id, None, "Invalid Subscription Token payload"
+                
+            return admin_user_id, admin_subscription_id, None
+
+        except jwt.ExpiredSignatureError:
+            return admin_user_id, None, "Subscription session expired"
+        except jwt.InvalidTokenError:
+            return admin_user_id, None, "Invalid Subscription Token"
+        except Exception as e:
+            return admin_user_id, None, f"Subscription Token Error: {str(e)}"
+
 class TokenGenerator:
     @staticmethod
     def generate_profile_token(user_id, email, mobile, name, username, role_id, roles, sid, sub_id):
