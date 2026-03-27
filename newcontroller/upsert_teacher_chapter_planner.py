@@ -129,3 +129,75 @@ def get_institute_admin_summary():
         return api_response(message="Internal Server Error", error=str(e), code=500, status="error")
     finally:
         if conn: conn.close()            
+        
+        
+        
+def get_teacher_academic_data():
+
+    conn = None
+
+    try:
+        #  AUTH (User Token)
+        user_id_str, auth_error = TokenVerifier.get_user_id()
+        if not user_id_str:
+            return api_response(
+                message="Unauthorized",
+                code=401,
+                status="error",
+                error=auth_error
+            )
+
+        teacher_user_id = int(user_id_str)
+
+        #  Subscription Token
+        sub_token = request.headers.get('Subscription-Token')
+        if not sub_token:
+            return api_response(
+                message="Subscription-Token missing",
+                code=400,
+                status="error"
+            )
+
+        if "Bearer " in sub_token:
+            sub_token = sub_token.split(" ")[1]
+
+        # DB CALL
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            """
+            CALL learning.usp_new_get_teacher_academic_data(
+                %s,
+                %s,
+                NULL,
+                NULL,
+                NULL
+            )
+            """,
+            (teacher_user_id, sub_token)
+        )
+
+        result = cur.fetchone()
+
+        return api_response(
+            message=result.get("p_msg"),
+            code=result.get("p_status_code"),
+            data=result.get("p_object", []),
+            status="success"
+            if result.get("p_status_code") == 200
+            else "error"
+        )
+
+    except Exception as e:
+
+        return api_response(
+            message="Internal Server Error",
+            code=500,
+            status="error",
+            error=str(e)
+        )
+
+    finally:
+        if conn:
+            conn.close()        
