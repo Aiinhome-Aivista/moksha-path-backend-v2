@@ -199,4 +199,61 @@ def get_teacher_planer_data():
     finally:
         if conn:
             conn.close()
+            
+            
+def get_student_planner_dashboard():
+    conn = None
+    try:
+        # 🔐 USER ID
+        user_id_str, _ = TokenVerifier.get_user_id()
+        if not user_id_str:
+            return api_response(message="Unauthorized", code=401, status="error")
+
+        user_id = int(user_id_str)
+
+        # 🔐 SUB TOKEN
+        sub_token = request.headers.get('Subscription-Token')
+        if not sub_token:
+            return api_response(message="Subscription token missing", code=400, status="error")
+
+        if "Bearer " in sub_token:
+            sub_token = sub_token.split(" ")[1]
+
+        # 🔥 DECODE TOKEN
+        sub_payload = jwt.decode(sub_token, options={"verify_signature": False})
+
+        subscription_id = sub_payload.get("sub_id")
+
+        if not subscription_id:
+            return api_response(message="Invalid subscription token", code=400, status="error")
+
+        # 🛢 DB CALL
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute(
+            "CALL public.usp_get_student_dashboard(%s,%s,NULL)",
+            (user_id, subscription_id)
+        )
+
+        result = cur.fetchone()
+
+        return api_response(
+            message="Student Dashboard Loaded",
+            code=200,
+            status="success",
+            data=result.get("p_result")
+        )
+
+    except Exception as e:
+        return api_response(
+            message="Error",
+            code=500,
+            status="error",
+            error=str(e)
+        )
+
+    finally:
+        if conn:
+            conn.close()          
  
