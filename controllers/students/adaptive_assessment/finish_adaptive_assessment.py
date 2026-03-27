@@ -10,11 +10,13 @@ import jwt
 def finish_adaptive_assessment():
     conn = None
     try:
-        # 1. AUTH
+        # 1. AUTH (Correctly getting student_id from token)
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
         
+        student_id = int(user_id_str)
+
         # 2. PAYLOAD
         data = request.get_json()
         attempt_id = data.get('attempt_id')
@@ -24,15 +26,16 @@ def finish_adaptive_assessment():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
+        # Call procedure passing student_id to match the updated bigint parameter
         cur.execute(
             "CALL learning.usp_v2_finish_addaptive_assessment_with_log(%s, %s, %s, NULL, NULL, NULL)",
-            (int(attempt_id), int(user_id_str), subscription_id)
+            (int(attempt_id), student_id, subscription_id)
         )
         
+        # Result set fetch (o_status, o_message, o_data)
         result = cur.fetchone()
         conn.commit()
 
-        # Handle result using names 'o_status', 'o_message', 'o_data'
         if result and result.get('o_status') == 200:
             return api_response(
                 message=result.get('o_message'), 

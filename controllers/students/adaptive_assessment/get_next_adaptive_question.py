@@ -5,7 +5,8 @@ from utils.token_helper import TokenVerifier
 from utils.api_response import api_response
 import psycopg2.extras
 import json
-import jwt   
+import jwt 
+  
 def get_next_adaptive_question():
     conn = None
     try:
@@ -24,13 +25,16 @@ def get_next_adaptive_question():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
+        # Added ::BIGINT to handle high-volume student IDs
         query = """
             CALL learning.usp_get_next_adaptive_question_v1(
-                %s::INTEGER, %s::INTEGER, 
+                %s::INTEGER, 
+                %s::BIGINT, 
                 NULL, NULL, NULL
             )
         """
         
+        # Passing student_id as the second argument for the filter logic
         cur.execute(query, (int(attempt_id), student_id))
         result = cur.fetchone()
         conn.commit()

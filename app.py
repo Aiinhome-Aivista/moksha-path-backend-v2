@@ -17,6 +17,7 @@ from controllers.parents.usp_v1_get_teacher_planner_get_dashboard import get_tea
 from controllers.registration.add_profile import add_profile_v4
 from controllers.registration.get_students_list_by_academics import get_students_list_by_academics
 from controllers.registration.registration import   select_profile_v4, send_ui_otp_v4,verify_and_login_v4
+from controllers.students.adaptive_assessment.skip_assessment_question import skip_assessment_question
 from controllers.students.adaptive_assessment.finish_adaptive_assessment import finish_adaptive_assessment
 from controllers.students.adaptive_assessment.get_next_adaptive_question import get_next_adaptive_question
 from controllers.students.adaptive_assessment.create_adaptive_set import create_adaptive_set
@@ -25,6 +26,7 @@ from controllers.students.adaptive_assessment.retake_details import get_retake_d
 from controllers.students.adaptive_assessment.save_adaptive_answer import save_adaptive_answer
 from controllers.students.adaptive_assessment.start_assessment import addaptive_start_assessment
 from controllers.students.adaptive_assessment.usp_get_addaptive_retake_questions import   start_adaptive_retake
+from controllers.students.adaptive_assessment.usp_get_assessment_result import get_assessment_result
 from controllers.students.assessment.finish_report_assessment import get_evaluation_dashboard, process_evaluation_data
 from controllers.students.assessment.new_assment_with_log.assment_save_single_answers_log import assment_save_single_answers_log
 from controllers.students.assessment.new_assment_with_log.attempt_controller_with_log import finish_assessment_with_log
@@ -508,6 +510,11 @@ def addaptive_start_assessment_route():
 def get_next_adaptive_question_route():
     return get_next_adaptive_question()
 
+@app.route(LEARNING + '/assessment/skip_assessment_question', methods=["POST"])
+def skip_assessment_question_route():
+    return skip_assessment_question()
+
+
 @app.route(LEARNING + '/assessment/save_adaptive_answer', methods=["POST"])
 def save_adaptive_answer_route():
     return save_adaptive_answer()
@@ -523,6 +530,11 @@ def get_retake_details_route():
 @app.route(LEARNING + '/assessment/start_adaptive_retake', methods=["POST"])
 def start_adaptive_retake_route():
     return start_adaptive_retake()
+
+
+@app.route(LEARNING + '/assessment/get_adaptive_assessment_result', methods=["GET"])
+def get_assessment_result_route():
+    return get_assessment_result()
  
  
 # 1. Trigger Data Processing (Batch Job)

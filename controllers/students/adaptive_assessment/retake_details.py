@@ -9,6 +9,12 @@ import psycopg2.extras
 assessment_router = Blueprint('assessment', __name__)
 
 def get_retake_details():
+    # 1. AUTHENTICATION & STUDENT_ID FETCH
+    user_id_str, auth_error = TokenVerifier.get_user_id()
+    if not user_id_str: 
+        return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
+        
+    student_id = int(user_id_str)
     payload = request.get_json()
     set_id = payload.get("set_id")
     
@@ -18,34 +24,27 @@ def get_retake_details():
     conn = None
     try:
         conn = get_db_connection()
-        # Disable autocommit to ensure the transaction stays open for the cursor
         conn.autocommit = False 
-        
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
-        # 1. Call the procedure. 
-        # The procedure OPENS the cursor named 'rs_questions'
-        cur.execute("CALL learning.usp_get_retake_questions(%s, 'rs_questions')", (set_id,))
+        # 2. Call the procedure with student_id
+        # Updated signature: (set_id, student_id, cursor_name)
+        cur.execute("CALL learning.usp_get_retake_questions(%s, %s, 'rs_questions')", (int(set_id), student_id))
         
-        # 2. Immediately FETCH from the same cursor in the same transaction
+        # 3. Fetch data
         cur.execute('FETCH ALL IN "rs_questions"')
         rows = cur.fetchall()
-
-        # 3. Commit the transaction now that we have the data
         conn.commit()
 
         if not rows:
-            return api_response(code=404, status="error", message="No questions found.", data=[])
+            return api_response(code=404, status="error", message="No questions found for this student.", data=[])
 
         formatted_data = []
         for row in rows:
-            # Safe JSON parsing for options
             parsed_options = row['options']
             if isinstance(parsed_options, str):
-                try:
-                    parsed_options = json.loads(parsed_options)
-                except:
-                    parsed_options = []
+                try: parsed_options = json.loads(parsed_options)
+                except: parsed_options = []
 
             formatted_data.append({
                 "sl_no": row['sl_no'],
@@ -64,9 +63,7 @@ def get_retake_details():
         return api_response(code=200, status="success", message="Success", data=formatted_data)
 
     except Exception as e:
-        if conn:
-            conn.rollback() # Rollback on error
-        return api_response(code=500, status="error", message=f"Database Error: {str(e)}")
+        if conn: conn.rollback()
+        return api_response(code=500, status="error", message=f"System Error: {str(e)}")
     finally:
-        if conn:
-            conn.close()
+        if conn: conn.close()
