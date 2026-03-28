@@ -108,7 +108,7 @@ from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 
 
-from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -571,6 +571,10 @@ def student_strength_weakness_route():
 @app.route(LEARNING + '/student_planner_dashboard', methods=['GET'])
 def student_planner_dashboard_route():
     return get_student_planner_dashboard()
+
+@app.route(LEARNING + '/generate_test_from_planner', methods=['POST'])
+def generate_test_from_planner_route(): 
+    return generate_test_from_planner()
 
 
 #Newly added routes can be placed here following the same pattern.#
