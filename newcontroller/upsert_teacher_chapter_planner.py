@@ -354,5 +354,75 @@ def get_student_planner_dashboard():
 
     finally:
         if conn:
-            conn.close()          
- 
+            conn.close()     
+            
+            
+def generate_test_from_planner():
+    conn = None
+    try:
+        # 🔐 AUTH USER
+        user_id_str, auth_error = TokenVerifier.get_user_id()
+        if not user_id_str:
+            return api_response(
+                message="Unauthorized",
+                code=401,
+                status="error",
+                error=auth_error
+            )
+
+        teacher_user_id = int(user_id_str)
+
+        # 🔐 GET SUB TOKEN
+        sub_token = request.headers.get("Subscription-Token")
+
+        if not sub_token:
+            return api_response(
+                message="Subscription token missing",
+                code=400,
+                status="error"
+            )
+
+        # ✅ remove Bearer
+        if "Bearer " in sub_token:
+            sub_token = sub_token.split(" ")[1]
+
+        # ✅ DECODE TOKEN (🔥 MAIN FIX)
+        sub_payload = jwt.decode(sub_token, options={"verify_signature": False})
+
+        subscription_code = sub_payload.get("sub_id") or sub_payload.get("subscription_id")
+
+        if not subscription_code:
+            return api_response(
+                message="Invalid subscription token",
+                code=400,
+                status="error"
+            )
+
+        # 🛢 DB CALL
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("""
+            CALL public.usp_v3_generate_test_from_teacher_planner(%s, %s)
+        """, (teacher_user_id, subscription_code))
+
+        conn.commit()
+
+        return api_response(
+            message="Test generated successfully",
+            code=200,
+            status="success"
+        )
+
+    except Exception as e:
+        print("REAL ERROR:", repr(e))
+        return api_response(
+            message="Internal Server Error",
+            code=500,
+            status="error",
+            error=str(e)
+        )
+
+    finally:
+        if conn:
+            conn.close()
