@@ -30,7 +30,7 @@ from controllers.students.assessment.new_assment_with_log.attempt_controller_wit
 from controllers.students.dashboart import get_main_dashboard
 from controllers.students.usp_v1_get_student_assessments import get_student_assessments_chapters_details
 from controllers.study_meterial.get_study_meterial import get_study_material
-from controllers.study_meterial.upload_study_meterial import upload_study_material
+from controllers.study_meterial.upload_study_meterial import upload_study_material, UPLOAD_FOLDER as NOTES_UPLOAD_FOLDER
 sys.dont_write_bytecode = True
 
 
@@ -818,6 +818,9 @@ def institute_get_available_teachers_route():
 def upload_study_material_route():
     return upload_study_material()
 
+@app.route('/uploads/notes/<path:filename>')
+def serve_notes(filename):
+    return send_from_directory(NOTES_UPLOAD_FOLDER, filename)
 
 @app.route(PARENT_TEACHER_URL + "/get_study_material", methods=["GET"])
 def get_study_material_route():
