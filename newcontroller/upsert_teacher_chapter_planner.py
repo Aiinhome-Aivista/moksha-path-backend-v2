@@ -331,7 +331,7 @@ def get_student_planner_dashboard():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         cur.execute(
-            "CALL public.usp1_get_student_dashboard(%s,%s,NULL)",
+            "CALL public.usp2_get_student_dashboard(%s,%s,NULL)",
             (user_id, subscription_id)
         )
 
