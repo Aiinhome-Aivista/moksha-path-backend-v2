@@ -49,6 +49,8 @@ def sp_get_study_material_v3():
                     "section_id": row[6],
                     "uploaded_by": row[7],
                     "uploaded_at": str(row[8]),
+                    "chapter_id": row[9],       # ✅ NEW
+                    "chapter_name": row[10],    # ✅ NEW
                 }
 
             # 🔥 RESOURCE HANDLING
