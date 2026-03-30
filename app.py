@@ -31,6 +31,7 @@ from controllers.students.dashboart import get_main_dashboard
 from controllers.students.usp_v1_get_student_assessments import get_student_assessments_chapters_details
 from controllers.study_meterial.get_study_meterial import get_study_material
 from controllers.study_meterial.upload_study_meterial import upload_study_material, UPLOAD_FOLDER as NOTES_UPLOAD_FOLDER
+from controllers.study_meterial.get_study_meterial_v3 import sp_get_study_material_v3
 sys.dont_write_bytecode = True
 
 
@@ -825,6 +826,11 @@ def serve_notes(filename):
 @app.route(PARENT_TEACHER_URL + "/get_study_material", methods=["GET"])
 def get_study_material_route():
     return get_study_material()
+
+@app.route(PARENT_TEACHER_URL + "/get_study_material_v3", methods=["GET"])
+def get_study_material_v3_route():
+    return sp_get_study_material_v3()
+
 # @app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
 # def bulk_upload_teachers_route():
 #     return bulk_upload_teachers()
