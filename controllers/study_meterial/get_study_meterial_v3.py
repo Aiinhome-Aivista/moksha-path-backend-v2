@@ -54,6 +54,7 @@ def sp_get_study_material_v3():
                     "subject_id": row[11],  
                     "subject_name": row[12],
                     "section_name": row[13],
+                    "description": row[14],
                 }
 
             # 🔥 RESOURCE HANDLING
