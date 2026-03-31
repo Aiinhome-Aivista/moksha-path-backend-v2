@@ -257,7 +257,7 @@ def upload_study_material():
         title = request.form.get("title")
         file_type = request.form.get("file_type")
         link_url = request.form.get("link_url")
-
+        description = request.form.get("description") or None
         board_id = to_int(request.form.get("board_id"))
         institute_id = to_int(request.form.get("institute_id"))
         class_id = to_int(request.form.get("class_id"))
@@ -297,6 +297,7 @@ def upload_study_material():
                     %s::text,
                     %s::text,
                     %s::text,
+                    %s::text,
                     %s::int,
                     NULL
                 )
@@ -309,6 +310,7 @@ def upload_study_material():
                     chapter_id,
                     section_id,
                     title,
+                    description,
                     file_type,
                     None,        # file_name
                     None,        # file_url
@@ -359,6 +361,7 @@ def upload_study_material():
                     %s::text,
                     %s::text,
                     %s::text,
+                    %s::text,
                     %s::int,
                     NULL
                 )
@@ -371,6 +374,7 @@ def upload_study_material():
                     chapter_id,
                     section_id,
                     title,
+                    description,
                     file_type,
                     file.filename,
                     file_url,
