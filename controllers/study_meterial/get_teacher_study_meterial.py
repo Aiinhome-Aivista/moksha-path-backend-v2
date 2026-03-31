@@ -2,6 +2,7 @@ from flask import request
 from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
+from utils.youtube_thumbnail import get_youtube_thumbnail
 
 
 def get_teacher_study_material():
@@ -64,8 +65,21 @@ def get_teacher_study_material():
         section_map = {}
         chapter_map = {}
         board_map = {}
+        thumbnail_cache = {}
 
         for row in rows:
+            link_url = row["link_url"]
+
+            # ---------- THUMBNAIL (CACHED) ----------
+            thumbnail = None
+
+            if row["file_type"] == "link" and link_url:
+                if link_url in thumbnail_cache:
+                    thumbnail = thumbnail_cache[link_url]
+                else:
+                    thumbnail = get_youtube_thumbnail(link_url)
+                    thumbnail_cache[link_url] = thumbnail
+
             # ---------- MAIN DATA ----------
             item = {
                 "id": row["id"],
@@ -76,23 +90,27 @@ def get_teacher_study_material():
                 "chapter_id": row["chapter_id"],
                 "section_id": row["section_id"],
                 "file_type": row["file_type"],
+
                 "resource": (
-                    row["link_url"] if row["file_type"] == "link" else row["file_url"]
+                    link_url if row["file_type"] == "link" else row["file_url"]
                 ),
+
+                # 🔥 NEW FIELD
+                "thumbnail": thumbnail
             }
+
             data.append(item)
 
             # ---------- FILTER BUILD ----------
             class_set.add(row["class_id"])
-
             subject_map[row["subject_id"]] = row["subject_name"]
-
             section_map[row["section_id"]] = f"Section {row['section_id']}"
 
             chapter_map[row["chapter_id"]] = {
                 "name": row["chapter_name"],
                 "subject_id": row["subject_id"],
             }
+
             board_map[row["board_id"]] = row["board_name"]
 
         # =========================
