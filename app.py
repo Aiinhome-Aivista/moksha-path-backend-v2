@@ -32,6 +32,7 @@ from controllers.students.usp_v1_get_student_assessments import get_student_asse
 from controllers.study_meterial.get_study_meterial import get_study_material
 from controllers.study_meterial.upload_study_meterial import upload_study_material, UPLOAD_FOLDER as NOTES_UPLOAD_FOLDER
 from controllers.study_meterial.get_study_meterial_v3 import sp_get_study_material_v3
+from controllers.study_meterial.get_teacher_study_meterial import get_teacher_study_material
 sys.dont_write_bytecode = True
 
 
@@ -818,6 +819,10 @@ def institute_get_available_teachers_route():
 @app.route(PARENT_TEACHER_URL + "/upload_study_material", methods=["POST"])
 def upload_study_material_route():
     return upload_study_material()
+
+@app.route(PARENT_TEACHER_URL + "/get_teacher_study_material", methods=["GET"])
+def get_teacher_study_material_route():
+    return get_teacher_study_material()
 
 @app.route('/uploads/notes/<path:filename>')
 def serve_notes(filename):
