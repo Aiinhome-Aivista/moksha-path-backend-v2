@@ -3,6 +3,7 @@ import jwt
 from config import JWT_SECRET, get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
+from utils.youtube_thumbnail import get_youtube_thumbnail
 
 
 def sp_get_study_material_v3():
@@ -51,17 +52,24 @@ def sp_get_study_material_v3():
                     "uploaded_at": str(row[8]),
                     "chapter_id": row[9],
                     "chapter_name": row[10],
-                    "subject_id": row[11],  
+                    "subject_id": row[11],
                     "subject_name": row[12],
                     "section_name": row[13],
+                    "description": row[14],
                 }
 
-            # 🔥 RESOURCE HANDLING
+            # 🔥 RESOURCE
             item["resource"] = (
                 item["link_url"]
                 if item["file_type"] == "link"
                 else item["file_url"]
             )
+
+            # 🔥 NEW: THUMBNAIL LOGIC
+            if item["file_type"] == "link":
+                item["thumbnail"] = get_youtube_thumbnail(item["link_url"])
+            else:
+                item["thumbnail"] = None
 
             data.append(item)
 
