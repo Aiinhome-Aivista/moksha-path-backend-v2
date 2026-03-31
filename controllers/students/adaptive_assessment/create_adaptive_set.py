@@ -26,7 +26,8 @@ def create_adaptive_set():
             return api_response(message="Request body is empty", code=400, status="error")
 
         # Grab the token from the Header
-        sub_token = request.headers.get('Subscription-Id')
+        # sub_token = request.headers.get('Subscription-Id')
+        sub_token = request.headers.get('Subscription-Id') or request.headers.get('Subscription-Token')
         
         if not sub_token:
             return api_response(message="Subscription-Id header is missing.", code=400, status="error")
