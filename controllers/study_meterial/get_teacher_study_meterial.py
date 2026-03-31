@@ -63,6 +63,7 @@ def get_teacher_study_material():
         subject_map = {}
         section_map = {}
         chapter_map = {}
+        board_map = {}
 
         for row in rows:
             # ---------- MAIN DATA ----------
@@ -92,11 +93,13 @@ def get_teacher_study_material():
                 "name": row["chapter_name"],
                 "subject_id": row["subject_id"],
             }
+            board_map[row["board_id"]] = row["board_name"]
 
         # =========================
         # ✅ FINAL FILTER STRUCTURE
         # =========================
         filters = {
+            "boards": [{"id": bid, "name": bname} for bid, bname in board_map.items()],
             "classes": [{"id": cid, "name": f"Class {cid}"} for cid in class_set],
             "subjects": [
                 {"id": sid, "name": sname} for sid, sname in subject_map.items()
