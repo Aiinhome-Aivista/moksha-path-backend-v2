@@ -5,6 +5,11 @@ from flask_cors import CORS
 from config import get_db_connection
 import sys
 
+import firebase_admin
+from firebase_admin import credentials
+cred = credentials.Certificate("serviceAccountKey.json")
+firebase_admin.initialize_app(cred)
+
 from controllers.common.get_academic_masters import add_institute, get_user_academic_details_nodependices
 from controllers.common.get_institute_hierarchy import get_institute_hierarchy
 from controllers.common.user_controller_with_paginations import get_all_usernames_with_paginations
@@ -112,6 +117,13 @@ from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_u
 
 
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data
+
+
+from newcontroller.notification_controller import (
+    save_token_controller,
+    send_notification_to_assigned_students_controller
+)
+
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -137,12 +149,23 @@ ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
 INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
 ANALYTICS_URL = "/api/v1/analytics"
+NOTIFICATION_URL = "/api/v1"
 # ==========================================
 # 3. ROUTES
 # ==========================================
 @app.route("/")
 def health():
     return "API is running"
+
+
+@app.route(NOTIFICATION_URL + '/save-token', methods=["POST"])
+def save_token():
+    return save_token_controller()
+
+
+@app.route(NOTIFICATION_URL + '/send-notification-to-assigned-students', methods=["POST"])
+def send_notification_to_assigned_students():
+    return send_notification_to_assigned_students_controller()
 
 # --- COMMON ROUTES ---
 # @app.route(ROOT_URL + '/register', methods=['POST'])
