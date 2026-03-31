@@ -9,7 +9,7 @@ import jwt
 # def upsert_teacher_chapter_planner():
 #     conn = None
 #     try:
-#         # 🔐 AUTH (User ID from token)
+#         #  AUTH (User ID from token)
 #         user_id_str, auth_error = TokenVerifier.get_user_id()
 #         if not user_id_str:
 #             return api_response(
@@ -21,7 +21,7 @@ import jwt
 
 #         user_id = int(user_id_str)
 
-#         # 🔐 Subscription Token
+#         #  Subscription Token
 #         sub_token = request.headers.get('Subscription-Token')
 #         if sub_token and "Bearer " in sub_token:
 #             sub_token = sub_token.split(" ")[1]
@@ -357,6 +357,77 @@ def get_student_planner_dashboard():
             conn.close()     
             
             
+# def generate_test_from_planner():
+#     conn = None
+#     try:
+#         # 🔐 AUTH USER
+#         user_id_str, auth_error = TokenVerifier.get_user_id()
+#         if not user_id_str:
+#             return api_response(
+#                 message="Unauthorized",
+#                 code=401,
+#                 status="error",
+#                 error=auth_error
+#             )
+
+#         teacher_user_id = int(user_id_str)
+
+#         # 🔐 GET SUB TOKEN
+#         sub_token = request.headers.get("Subscription-Token")
+
+#         if not sub_token:
+#             return api_response(
+#                 message="Subscription token missing",
+#                 code=400,
+#                 status="error"
+#             )
+
+#         # ✅ remove Bearer
+#         if "Bearer " in sub_token:
+#             sub_token = sub_token.split(" ")[1]
+
+#         # ✅ DECODE TOKEN (🔥 MAIN FIX)
+#         sub_payload = jwt.decode(sub_token, options={"verify_signature": False})
+
+#         subscription_code = sub_payload.get("sub_id") or sub_payload.get("subscription_id")
+
+#         if not subscription_code:
+#             return api_response(
+#                 message="Invalid subscription token",
+#                 code=400,
+#                 status="error"
+#             )
+
+#         # 🛢 DB CALL
+#         conn = get_db_connection()
+#         cur = conn.cursor()
+
+#         cur.execute("""
+#             CALL public.usp_v3_generate_test_from_teacher_planner(%s, %s)
+#         """, (teacher_user_id, subscription_code))
+
+#         conn.commit()
+
+#         return api_response(
+#             message="Test generated successfully",
+#             code=200,
+#             status="success"
+#         )
+
+#     except Exception as e:
+#         print("REAL ERROR:", repr(e))
+#         return api_response(
+#             message="Internal Server Error",
+#             code=500,
+#             status="error",
+#             error=str(e)
+#         )
+
+#     finally:
+#         if conn:
+#             conn.close()
+
+
 def generate_test_from_planner():
     conn = None
     try:
@@ -386,7 +457,7 @@ def generate_test_from_planner():
         if "Bearer " in sub_token:
             sub_token = sub_token.split(" ")[1]
 
-        # ✅ DECODE TOKEN (🔥 MAIN FIX)
+        # ✅ DECODE TOKEN
         sub_payload = jwt.decode(sub_token, options={"verify_signature": False})
 
         subscription_code = sub_payload.get("sub_id") or sub_payload.get("subscription_id")
@@ -398,13 +469,40 @@ def generate_test_from_planner():
                 status="error"
             )
 
-        # 🛢 DB CALL
+        # =====================================================
+        # 🔥 NEW: GET CHAPTER IDS FROM BODY
+        # =====================================================
+        data = request.get_json()
+
+        if not data or "chapter_ids" not in data:
+            return api_response(
+                message="chapter_ids is required",
+                code=400,
+                status="error"
+            )
+
+        chapter_ids = data.get("chapter_ids")
+
+        if not isinstance(chapter_ids, list) or len(chapter_ids) == 0:
+            return api_response(
+                message="chapter_ids must be a non-empty array",
+                code=400,
+                status="error"
+            )
+
+        # =====================================================
+        # 🛢 DB CALL (UPDATED SP)
+        # =====================================================
         conn = get_db_connection()
         cur = conn.cursor()
 
         cur.execute("""
-            CALL public.usp_v3_generate_test_from_teacher_planner(%s, %s)
-        """, (teacher_user_id, subscription_code))
+            CALL public.usp_v4_generate_test_from_teacher_planner(%s, %s, %s)
+        """, (
+            teacher_user_id,
+            subscription_code,
+            chapter_ids  #  NEW PARAM
+        ))
 
         conn.commit()
 
@@ -426,3 +524,43 @@ def generate_test_from_planner():
     finally:
         if conn:
             conn.close()
+ 
+ 
+def get_student_subjects_tab_info():
+    conn = None
+    try:
+        user_id_str, _ = TokenVerifier.get_user_id()
+        user_id = int(user_id_str)
+
+        sub_token = request.headers.get("Subscription-Token")
+        if "Bearer " in sub_token:
+            sub_token = sub_token.split(" ")[1]
+
+        sub_payload = jwt.decode(sub_token, options={"verify_signature": False})
+        subscription_id = sub_payload.get("sub_id")
+
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        cur.execute("""
+            CALL public.usp_get_student_subjects_tab_info(%s, %s, %s)
+        """, (user_id, subscription_id, None))
+
+        row = cur.fetchone()
+
+        return api_response(
+            message="Subjects fetched",
+            data=row.get("p_result"),
+            status="success"
+        )
+
+    except Exception as e:
+        return api_response(
+            message="Error",
+            error=str(e),
+            status="error"
+        )
+
+    finally:
+        if conn:
+            conn.close() 

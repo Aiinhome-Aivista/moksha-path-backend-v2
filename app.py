@@ -117,12 +117,11 @@ from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 
 
-from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner
-
 from newcontroller.notification_controller import (
     save_token_controller,
     send_notification_to_assigned_students_controller
 )
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -868,6 +867,10 @@ def bulk_upload_teachers_route():
     return bulk_upload_users_controller_v2()
 
 
+
+@app.route(LEARNING + "/get_student_subjects_tab_info", methods=["GET"])
+def get_student_subjects_tab_info_route():
+    return get_student_subjects_tab_info()
 
 
 # ==========================================
