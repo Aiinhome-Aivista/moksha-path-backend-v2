@@ -34,6 +34,10 @@ from controllers.students.assessment.new_assment_with_log.assment_save_single_an
 from controllers.students.assessment.new_assment_with_log.attempt_controller_with_log import finish_assessment_with_log
 from controllers.students.dashboart import get_main_dashboard
 from controllers.students.usp_v1_get_student_assessments import get_student_assessments_chapters_details
+from controllers.study_meterial.get_study_meterial import get_study_material
+from controllers.study_meterial.upload_study_meterial import upload_study_material, UPLOAD_FOLDER as NOTES_UPLOAD_FOLDER
+from controllers.study_meterial.get_study_meterial_v3 import sp_get_study_material_v3
+from controllers.study_meterial.get_teacher_study_meterial import get_teacher_study_material
 sys.dont_write_bytecode = True
 
 
@@ -108,22 +112,17 @@ from controllers.common.user_profile_details import get_user_profile, update_use
 
 from controllers.institute_admin.teacher_assign_controller import assign_teacher, remove_teacher, get_assigned_teachers, get_available_teachers
 from controllers.blogs.author_controller import get_authors
-from controllers.analytics.user_activity_log_controller import log_user_activity
-from controllers.analytics.log_activity_controller import log_activity
-
 from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, get_student_planner_dashboard
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 
 
-from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data
-
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner
 
 from newcontroller.notification_controller import (
     save_token_controller,
     send_notification_to_assigned_students_controller
 )
-
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -147,9 +146,12 @@ SUBCRIPTION_URL = '/api/v1/subscription'
 LEARNING = '/api/v1/learning'
 ROOT_URL = ''  # For endpoints currently at the root level
 BLOG_URL = '/api/v1/blogs'
+
 INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
 ANALYTICS_URL = "/api/v1/analytics"
+# ANALYTICS_URL = "/api/v1/log"
 NOTIFICATION_URL = "/api/v1"
+
 # ==========================================
 # 3. ROUTES
 # ==========================================
@@ -599,6 +601,10 @@ def student_strength_weakness_route():
 def student_planner_dashboard_route():
     return get_student_planner_dashboard()
 
+@app.route(LEARNING + '/generate_test_from_planner', methods=['POST'])
+def generate_test_from_planner_route(): 
+    return generate_test_from_planner()
+
 
 #Newly added routes can be placed here following the same pattern.#
 # Newly added routes can be placed here following the same pattern.#
@@ -830,6 +836,27 @@ def institute_get_teachers_route():
 @app.route(INSTITUTE_ADMIN_URL + '/available_teachers', methods=["GET"])
 def institute_get_available_teachers_route():
     return get_available_teachers()
+
+
+@app.route(PARENT_TEACHER_URL + "/upload_study_material", methods=["POST"])
+def upload_study_material_route():
+    return upload_study_material()
+
+@app.route(PARENT_TEACHER_URL + "/get_teacher_study_material", methods=["GET"])
+def get_teacher_study_material_route():
+    return get_teacher_study_material()
+
+@app.route('/uploads/notes/<path:filename>')
+def serve_notes(filename):
+    return send_from_directory(NOTES_UPLOAD_FOLDER, filename)
+
+@app.route(PARENT_TEACHER_URL + "/get_study_material", methods=["GET"])
+def get_study_material_route():
+    return get_study_material()
+
+@app.route(PARENT_TEACHER_URL + "/get_study_material_v3", methods=["GET"])
+def get_study_material_v3_route():
+    return sp_get_study_material_v3()
 
 # @app.route(INSTITUTE_ADMIN_URL + '/upload_teacher_list', methods=["POST"])
 # def bulk_upload_teachers_route():
