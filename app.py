@@ -110,8 +110,8 @@ from controllers.blogs.author_controller import get_authors
 from controllers.institute_admin.bulk_teacher_upload_controller import bulk_upload_teachers
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, get_student_planner_dashboard
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
-
-
+from controllers.students.adaptive_assessment.skip_assessment_question import skip_assessment_question
+from controllers.students.adaptive_assessment.usp_get_assessment_result import get_assessment_result
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info
 # ==========================================
 # 1. SETUP & CONFIGURATION
@@ -524,6 +524,13 @@ def get_retake_details_route():
 def start_adaptive_retake_route():
     return start_adaptive_retake()
 
+@app.route(LEARNING + '/assessment/skip_assessment_question', methods=["POST"])
+def skip_assessment_question_route():
+    return skip_assessment_question()
+
+@app.route(LEARNING + '/assessment/get_adaptive_assessment_result', methods=["GET"])
+def get_assessment_result_route():
+    return get_assessment_result()
 
 # 1. Trigger Data Processing (Batch Job)
 @app.route(LEARNING + '/evaluation/process', methods=["POST"])
