@@ -543,7 +543,7 @@ def get_student_subjects_tab_info():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         cur.execute("""
-            CALL public.usp_get_student_subjects_tab_info(%s, %s, %s)
+            CALL public.usp_v2_get_student_subjects_tab_info(%s, %s, %s)
         """, (user_id, subscription_id, None))
 
         row = cur.fetchone()

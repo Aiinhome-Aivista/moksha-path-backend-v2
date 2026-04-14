@@ -116,6 +116,9 @@ from controllers.institute_admin.bulk_teacher_upload_controller import bulk_uplo
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, get_student_planner_dashboard
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 
+from controllers.analytics.user_activity_log_controller import log_user_activity
+from controllers.analytics.log_activity_controller import log_activity
+
 
 from newcontroller.notification_controller import (
     save_token_controller,
@@ -148,7 +151,6 @@ BLOG_URL = '/api/v1/blogs'
 
 INSTITUTE_ADMIN_URL = '/api/v1/institute_admin'
 ANALYTICS_URL = "/api/v1/analytics"
-# ANALYTICS_URL = "/api/v1/log"
 NOTIFICATION_URL = "/api/v1"
 
 # ==========================================
