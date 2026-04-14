@@ -113,6 +113,7 @@ from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_u
 from controllers.students.adaptive_assessment.skip_assessment_question import skip_assessment_question
 from controllers.students.adaptive_assessment.usp_get_assessment_result import get_assessment_result
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info
+from controllers.students.subject_wise_adaptive.create_subject_wise_adaptive_assessment import create_subject_wise_adaptive_assessment
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -857,6 +858,12 @@ def bulk_upload_teachers_route():
 @app.route(LEARNING + "/get_student_subjects_tab_info", methods=["GET"])
 def get_student_subjects_tab_info_route():
     return get_student_subjects_tab_info()
+
+
+# subject wise adaptive assessment
+@app.route(LEARNING + '/assessment/create_subject_wise_adaptive_set', methods=["POST"])
+def create_subject_wise_adaptive_set_route():
+    return create_subject_wise_adaptive_assessment()
 
 
 # ==========================================
