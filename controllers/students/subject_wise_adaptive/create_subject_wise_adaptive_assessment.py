@@ -38,7 +38,7 @@ def create_subject_wise_adaptive_assessment():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         cur.execute("""
-            CALL learning.usp_create_subject_wise_adaptive_assessment(
+            CALL learning.usp_create_subject_wise_adaptive_assessment_v2(
                 %s,%s,%s,%s,%s,%s,%s,%s,
                 NULL,NULL,NULL
             )
@@ -53,16 +53,45 @@ def create_subject_wise_adaptive_assessment():
             duration
         ))
 
+        # result = cur.fetchone()
+        # conn.commit()
+
+        # return api_response(
+        #     message=result.get("p_message"),
+        #     data=result.get("p_data"),
+        #     code=200,
+        #     status="success"
+        # )
         result = cur.fetchone()
+
+        res_data = result.get("p_data") or {}
+
+        #  STEP 1: set_id fetch
+        # new_set_id = res_data.get("set_id")
+
+        #  STEP 2: slot generation call
+        # if new_set_id:
+        #     cur.execute(
+        #         "CALL learning.usp_generate_question_slots(%s::BIGINT)",
+        #         (new_set_id,)
+        #     )
+        set_ids = res_data.get("set_ids") or []
+
+        for sid in set_ids:
+            cur.execute(
+                "CALL learning.usp_generate_question_slots(%s::BIGINT)",
+                (sid,)
+            )
+
+        #  STEP 3: commit AFTER slot generation
         conn.commit()
 
         return api_response(
             message=result.get("p_message"),
-            data=result.get("p_data"),
+            data=res_data,
             code=200,
             status="success"
         )
-
     except Exception as e:
         if conn: conn.rollback()
         return api_response(message="Error", code=500, status="error", error=str(e))

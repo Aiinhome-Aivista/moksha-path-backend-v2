@@ -112,8 +112,9 @@ from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 from controllers.students.adaptive_assessment.skip_assessment_question import skip_assessment_question
 from controllers.students.adaptive_assessment.usp_get_assessment_result import get_assessment_result
-from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info, get_multi_chapter_tests
 from controllers.students.subject_wise_adaptive.create_subject_wise_adaptive_assessment import create_subject_wise_adaptive_assessment
+
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -866,6 +867,12 @@ def create_subject_wise_adaptive_set_route():
     return create_subject_wise_adaptive_assessment()
 
 
+@app.route(LEARNING + "/get_multi_chapter_tests", methods=["GET"])
+def get_multi_chapter_tests_route():
+    return get_multi_chapter_tests()
+    
+
+
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
@@ -882,7 +889,7 @@ def check_db_connection():
 
 if __name__ == "__main__":
     check_db_connection()    
-    port = int(os.environ.get("PORT", 8000))
+    port = int(os.environ.get("PORT", 8001))
     debug_mode = os.environ.get("FLASK_DEBUG", "True").lower() == "true"    
     print(f"Server running on port {port}")
     app.run(host="0.0.0.0", port=port, debug=debug_mode)

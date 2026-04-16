@@ -195,7 +195,7 @@ from utils.api_response import api_response
 
 BASE_DIR = os.getcwd()
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads", "notes")
-BASE_URL = "http://127.0.0.1:8000"  # change in production
+BASE_URL = "http://127.0.0.1:8001"  # change in production
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
