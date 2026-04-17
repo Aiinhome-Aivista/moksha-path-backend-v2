@@ -25,7 +25,7 @@ def get_next_adaptive_question():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         query = """
-            CALL learning.usp_get_next_adaptive_question_v1(
+            CALL learning.usp_get_next_adaptive_question_v2(
                 %s::INTEGER, %s::INTEGER, 
                 NULL, NULL, NULL
             )
