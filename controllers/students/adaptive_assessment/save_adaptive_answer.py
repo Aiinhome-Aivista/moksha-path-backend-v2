@@ -31,9 +31,10 @@ def save_adaptive_answer():
             return api_response(message="attempt_id, question_id, and sl_no are required", code=400, status="error")
 
         # 🔥 Auto-detect if skipped (If answer is None or empty string)
+        # is_skipped = True if answer is None or str(answer).strip() == "" else False
+        # answer_text = str(answer) if not is_skipped else ""
         is_skipped = True if answer is None or str(answer).strip() == "" else False
-        answer_text = str(answer) if not is_skipped else ""
-
+        answer_text = str(answer).strip().lower() if not is_skipped else ""
         # 3. DATABASE CALL
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
