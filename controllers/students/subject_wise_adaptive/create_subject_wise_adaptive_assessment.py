@@ -75,13 +75,13 @@ def create_subject_wise_adaptive_assessment():
         #         "CALL learning.usp_generate_question_slots(%s::BIGINT)",
         #         (new_set_id,)
         #     )
-        set_ids = res_data.get("set_ids") or []
+        # set_ids = res_data.get("set_ids") or []
 
-        for sid in set_ids:
-            cur.execute(
-                "CALL learning.usp_generate_question_slots(%s::BIGINT)",
-                (sid,)
-            )
+        # for sid in set_ids:
+        #     cur.execute(
+        #         "CALL learning.usp_generate_question_slots(%s::BIGINT)",
+        #         (sid,)
+        #     )
 
         #  STEP 3: commit AFTER slot generation
         conn.commit()
