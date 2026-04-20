@@ -190,12 +190,13 @@ import os
 import uuid
 from flask import request, send_from_directory
 import jwt
-from config import JWT_SECRET, get_db_connection
+from config import JWT_SECRET, get_db_connection, HOST_URL
 from utils.api_response import api_response
 
-BASE_DIR = os.getcwd()
+AZURE_WWWROOT = "/home/site/wwwroot"
+# Match blog_controller behavior on Azure, but remain usable locally.
+BASE_DIR = os.getenv("BASE_DIR") or (AZURE_WWWROOT if os.path.exists(AZURE_WWWROOT) else os.getcwd())
 UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads", "notes")
-BASE_URL = "http://127.0.0.1:8001"  # change in production
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
@@ -344,8 +345,8 @@ def upload_study_material():
                 file_path = os.path.join(UPLOAD_FOLDER, unique_name)
                 file.save(file_path)
 
-                # ✅ FULL URL
-                file_url = f"{BASE_URL}/uploads/notes/{unique_name}"
+                # ✅ FULL URL (dynamic like blog_controller)
+                file_url = f"{HOST_URL}/uploads/notes/{unique_name}"
 
                 cursor.execute(
                 """
