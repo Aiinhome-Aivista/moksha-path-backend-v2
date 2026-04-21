@@ -652,4 +652,91 @@ def get_multi_chapter_tests():
 
     finally:
         if conn:
+            conn.close()  
+            
+            
+def get_student_dashboard_view():
+    conn = None
+    try:
+        # 🔐 USER ID
+        user_id_str, _ = TokenVerifier.get_user_id()
+        if not user_id_str:
+            return api_response(message="Unauthorized", code=401, status="error")
+
+        user_id = int(user_id_str)
+
+        # 🛢 DB CONNECT
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # 🔥 VIEW CALL (only this)
+        cur.execute("""
+            SELECT *
+            FROM report.student_dashboard_vw
+            WHERE student_id = %s
+            ORDER BY set_id ASC
+        """, (user_id,))
+
+        result = cur.fetchall()
+
+        return api_response(
+            message="Student Dashboard Loaded",
+            code=200,
+            status="success",
+            data=result
+        )
+
+    except Exception as e:
+        return api_response(
+            message="Error",
+            code=500,
+            status="error",
+            error=str(e)
+        )
+
+    finally:
+        if conn:
+            conn.close()                      
+            
+
+def get_teacher_dashboard_view():
+    conn = None
+    try:
+        # 🔐 USER (teacher)
+        user_id_str, _ = TokenVerifier.get_user_id()
+        if not user_id_str:
+            return api_response(message="Unauthorized", code=401, status="error")
+
+        teacher_id = int(user_id_str)
+
+        # 🛢 DB CONNECT
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+
+        # 🔥 VIEW CALL
+        cur.execute("""
+            SELECT *
+            FROM report.teacher_dashboard_vw
+            ORDER BY set_id ASC
+        """)
+
+        result = cur.fetchall()
+
+        return api_response(
+            message="Teacher Dashboard Loaded",
+            code=200,
+            status="success",
+            data=result
+        )
+
+    except Exception as e:
+        return api_response(
+            message="Error",
+            code=500,
+            status="error",
+            error=str(e)
+        )
+
+    finally:
+        if conn:
             conn.close()            

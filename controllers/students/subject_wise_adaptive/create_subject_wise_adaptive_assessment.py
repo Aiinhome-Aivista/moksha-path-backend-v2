@@ -62,9 +62,9 @@ def create_subject_wise_adaptive_assessment():
         #     code=200,
         #     status="success"
         # )
-        result = cur.fetchone()
+        # result = cur.fetchone()
 
-        res_data = result.get("p_data") or {}
+        # res_data = result.get("p_data") or {}
 
         #  STEP 1: set_id fetch
         # new_set_id = res_data.get("set_id")
@@ -84,10 +84,33 @@ def create_subject_wise_adaptive_assessment():
         #     )
 
         #  STEP 3: commit AFTER slot generation
+        # conn.commit()
+
+        # return api_response(
+        #     message=result.get("p_message"),
+        #     data=res_data,
+        #     code=200,
+        #     status="success"
+        # )
+        result = cur.fetchone()
+
+        p_status = result.get("p_status")
+        p_message = result.get("p_message")
+        res_data = result.get("p_data") or {}
+
         conn.commit()
 
+        #  IMPORTANT CHECK
+        if p_status == 'error':
+            return api_response(
+                message=p_message,
+                data=res_data,
+                code=400,
+                status="error"
+            )
+
         return api_response(
-            message=result.get("p_message"),
+            message=p_message,
             data=res_data,
             code=200,
             status="success"

@@ -112,7 +112,7 @@ from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter
 from controllers.institute_admin.bulk_teacher_upload_controller_v2 import bulk_upload_users_controller_v2
 from controllers.students.adaptive_assessment.skip_assessment_question import skip_assessment_question
 from controllers.students.adaptive_assessment.usp_get_assessment_result import get_assessment_result
-from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info, get_multi_chapter_tests
+from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info, get_multi_chapter_tests, get_student_dashboard_view, get_teacher_dashboard_view
 from controllers.students.subject_wise_adaptive.create_subject_wise_adaptive_assessment import create_subject_wise_adaptive_assessment
 
 # ==========================================
@@ -871,7 +871,13 @@ def create_subject_wise_adaptive_set_route():
 def get_multi_chapter_tests_route():
     return get_multi_chapter_tests()
     
+@app.route(LEARNING + "/student_dashboard_view", methods=["GET"])
+def student_dashboard_view_route():
+    return get_student_dashboard_view()
 
+@app.route(LEARNING + "/teacher_dashboard_view", methods=["GET"])
+def teacher_dashboard_view_route():     
+    return get_teacher_dashboard_view()
 
 # ==========================================
 # 4. UTILITIES & STARTUP
