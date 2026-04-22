@@ -1,3 +1,5 @@
+from flask import request
+
 from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
@@ -15,6 +17,16 @@ def teacher_full_dashboard():
             return api_response(message="Unauthorized", code=401, status="error")
 
         teacher_id = int(teacher_id_str)
+
+        sub_token = request.headers.get("Subscription-Token") or request.headers.get(
+            "X-Subscription-Token"
+        )
+        if not sub_token:
+            return api_response(
+                message="Subscription Token is missing in headers",
+                code=400,
+                status="error",
+            )
 
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
