@@ -114,7 +114,8 @@ from controllers.students.adaptive_assessment.skip_assessment_question import sk
 from controllers.students.adaptive_assessment.usp_get_assessment_result import get_assessment_result
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info, get_multi_chapter_tests, get_student_dashboard_view, get_teacher_dashboard_view
 from controllers.students.subject_wise_adaptive.create_subject_wise_adaptive_assessment import create_subject_wise_adaptive_assessment
-
+from controllers.kpi.student_performance_vw import student_performance_vw
+from controllers.kpi.student_subject_dashboard_vw import student_subject_dashboard
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -879,6 +880,16 @@ def student_dashboard_view_route():
 def teacher_dashboard_view_route():     
     return get_teacher_dashboard_view()
 
+
+# kpi
+@app.route(LEARNING + "/student_performance_vw", methods=["GET"])
+def student_performance_vw_route(): 
+    return student_performance_vw()
+
+@app.route(LEARNING + "/student_subject_dashboard_vw", methods=["GET"])
+def student_subject_dashboard_vw_route():
+    return student_subject_dashboard()
+
 # ==========================================
 # 4. UTILITIES & STARTUP
 # ==========================================
@@ -895,7 +906,7 @@ def check_db_connection():
 
 if __name__ == "__main__":
     check_db_connection()    
-    port = int(os.environ.get("PORT", 8001))
+    port = int(os.environ.get("PORT", 8000))
     debug_mode = os.environ.get("FLASK_DEBUG", "True").lower() == "true"    
     print(f"Server running on port {port}")
     app.run(host="0.0.0.0", port=port, debug=debug_mode)

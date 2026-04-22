@@ -672,8 +672,8 @@ def get_student_dashboard_view():
         # 🔥 VIEW CALL (only this)
         cur.execute("""
             SELECT *
-            FROM report.student_dashboard_vw
-            WHERE student_id = %s
+            FROM report.student_kpi_setwise_final
+            WHERE user_id  = %s
             ORDER BY set_id ASC
         """, (user_id,))
 
