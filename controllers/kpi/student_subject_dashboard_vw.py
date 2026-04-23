@@ -4,7 +4,7 @@ from utils.token_helper import TokenVerifier
 import psycopg2.extras
 
 
-def student_subject_dashboard():
+def student_subject_dashboard_vw():
     conn = None
     cur = None
 

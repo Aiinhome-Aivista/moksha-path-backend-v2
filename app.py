@@ -115,7 +115,8 @@ from controllers.students.adaptive_assessment.usp_get_assessment_result import g
 from newcontroller.upsert_teacher_chapter_planner import  upsert_teacher_chapter_planner,get_institute_admin_summary,get_teacher_planer_data, generate_test_from_planner, get_student_subjects_tab_info, get_multi_chapter_tests, get_student_dashboard_view, get_teacher_dashboard_view
 from controllers.students.subject_wise_adaptive.create_subject_wise_adaptive_assessment import create_subject_wise_adaptive_assessment
 from controllers.kpi.student_performance_vw import student_performance_vw
-from controllers.kpi.student_subject_dashboard_vw import student_subject_dashboard
+from controllers.kpi.student_subject_dashboard_vw import student_subject_dashboard_vw
+from controllers.kpi.student_mock_dashboard_vw import student_mock_dashboard_vw
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -888,7 +889,12 @@ def student_performance_vw_route():
 
 @app.route(LEARNING + "/student_subject_dashboard_vw", methods=["GET"])
 def student_subject_dashboard_vw_route():
-    return student_subject_dashboard()
+    return student_subject_dashboard_vw()
+
+
+@app.route(LEARNING + "/student_mock_dashboard_vw", methods=["GET"])
+def student_mock_dashboard_vw_route():
+    return student_mock_dashboard_vw()
 
 # ==========================================
 # 4. UTILITIES & STARTUP
