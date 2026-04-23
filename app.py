@@ -33,6 +33,7 @@ from controllers.study_meterial.get_study_meterial import get_study_material
 from controllers.study_meterial.upload_study_meterial import upload_study_material, UPLOAD_FOLDER as NOTES_UPLOAD_FOLDER
 from controllers.study_meterial.get_study_meterial_v3 import sp_get_study_material_v3
 from controllers.study_meterial.get_teacher_study_meterial import get_teacher_study_material
+from controllers.kpi.teacher_dashboard_vw import teacher_full_dashboard
 sys.dont_write_bytecode = True
 
 
@@ -595,7 +596,7 @@ def generate_test_from_planner_route():
     return generate_test_from_planner()
 
 
-#Newly added routes can be placed here following the same pattern.#
+# Newly added routes can be placed here following the same pattern.#
 # Newly added routes can be placed here following the same pattern.#
 @app.route(AUTH_URL + '/get_academic_hierarchy', methods=["GET"])
 def get_academic_hierarchy_route():
@@ -857,7 +858,6 @@ def bulk_upload_teachers_route():
     return bulk_upload_users_controller_v2()
 
 
-
 @app.route(LEARNING + "/get_student_subjects_tab_info", methods=["GET"])
 def get_student_subjects_tab_info_route():
     return get_student_subjects_tab_info()
@@ -872,7 +872,7 @@ def create_subject_wise_adaptive_set_route():
 @app.route(LEARNING + "/get_multi_chapter_tests", methods=["GET"])
 def get_multi_chapter_tests_route():
     return get_multi_chapter_tests()
-    
+
 @app.route(LEARNING + "/student_dashboard_view", methods=["GET"])
 def student_dashboard_view_route():
     return get_student_dashboard_view()
@@ -895,6 +895,10 @@ def student_subject_dashboard_vw_route():
 @app.route(LEARNING + "/student_mock_dashboard_vw", methods=["GET"])
 def student_mock_dashboard_vw_route():
     return student_mock_dashboard_vw()
+
+@app.route(LEARNING + "/teacher_dashboard_vw", methods=["GET"])
+def teacher_dashboard_vw_route():
+    return teacher_full_dashboard()
 
 # ==========================================
 # 4. UTILITIES & STARTUP
