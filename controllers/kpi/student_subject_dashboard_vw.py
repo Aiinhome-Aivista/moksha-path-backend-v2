@@ -9,7 +9,7 @@ def student_subject_dashboard_vw():
     cur = None
 
     try:
-        # 🔐 USER
+        #  USER
         user_id_str, _ = TokenVerifier.get_user_id()
         if not user_id_str:
             return api_response(message="Unauthorized", code=401, status="error")
@@ -20,7 +20,7 @@ def student_subject_dashboard_vw():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         # =========================
-        # 🔥 1. SUBJECT SUMMARY (MAIN DRIVER)
+        #  1. SUBJECT SUMMARY (MAIN DRIVER)
         # =========================
         cur.execute("""
             SELECT *
@@ -32,7 +32,7 @@ def student_subject_dashboard_vw():
         total_subjects = len(subjects)
 
         # =========================
-        # 🔥 2. LEVEL DATA
+        #  2. LEVEL DATA
         # =========================
         cur.execute("""
             SELECT *
@@ -42,7 +42,7 @@ def student_subject_dashboard_vw():
         levels = cur.fetchall()
 
         # =========================
-        # 🔥 3. CHAPTER DATA
+        #  3. CHAPTER DATA
         # =========================
         cur.execute("""
             SELECT *
@@ -52,7 +52,7 @@ def student_subject_dashboard_vw():
         chapters = cur.fetchall()
 
         # -------------------------------
-        # 🧠 BUILD FINAL STRUCTURE
+        #  BUILD FINAL STRUCTURE
         # -------------------------------
         subject_map = {}
 
@@ -88,7 +88,7 @@ def student_subject_dashboard_vw():
                     "avg_time": lvl.get("avg_time") or 0
                 })
 
-        # 🔥 SORT LEVELS (UI ORDER FIX)
+        #  SORT LEVELS (UI ORDER FIX)
         level_order = {"L1": 1, "L2": 2, "L3": 3, "L4": 4}
 
         for sid in subject_map:
@@ -97,20 +97,51 @@ def student_subject_dashboard_vw():
                 key=lambda x: level_order.get(x.get("level"), 99)
             )
 
+        # # =========================
+        # # CHAPTERS
+        # # =========================
+        # for ch in chapters:
+        #     sid = ch["subject_id"]
+
+        #     if sid in subject_map:
+        #         subject_map[sid]["chapters"].append({
+        #             "chapter_id": ch.get("chapter_id"),
+        #             "chapter_name": ch.get("chapter_name") or ch.get("chapters_name"),
+        #             "accuracy": ch.get("accuracy") or 0,
+        #             "avg_time": ch.get("avg_time") or 0
+        #         })
+
         # =========================
-        # CHAPTERS
+        # CHAPTERS (LEVEL-WISE FIX)
         # =========================
+        chapter_map = {}
+
         for ch in chapters:
             sid = ch["subject_id"]
+            cid = ch["chapter_id"]
 
-            if sid in subject_map:
-                subject_map[sid]["chapters"].append({
-                    "chapter_id": ch.get("chapter_id"),
-                    "chapter_name": ch.get("chapter_name") or ch.get("chapters_name"),
-                    "accuracy": ch.get("accuracy") or 0,
-                    "avg_time": ch.get("avg_time") or 0
-                })
+            if sid not in subject_map:
+                continue
 
+            key = (sid, cid)
+
+            if key not in chapter_map:
+                chapter_map[key] = {
+                    "chapter_id": cid,
+                    "chapter_name": ch.get("chapters_name"),
+                    "levels": []
+                }
+
+            chapter_map[key]["levels"].append({
+                "level": ch.get("level_code"),
+                "bucket": ch.get("level_bucket"),
+                "accuracy": ch.get("accuracy") or 0,
+                "avg_time": ch.get("avg_time") or 0
+            })
+
+        # attach to subject
+        for (sid, cid), val in chapter_map.items():
+            subject_map[sid]["chapters"].append(val)
         # =========================
         # FINAL OUTPUT
         # =========================
