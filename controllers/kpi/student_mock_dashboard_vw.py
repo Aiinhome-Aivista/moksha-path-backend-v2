@@ -9,6 +9,7 @@ def student_mock_dashboard_vw():
     cur = None
 
     try:
+        # 🔐 AUTH
         user_id_str, _ = TokenVerifier.get_user_id()
         if not user_id_str:
             return api_response(message="Unauthorized", code=401, status="error")
@@ -18,6 +19,7 @@ def student_mock_dashboard_vw():
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
+        # 📊 FETCH DATA
         cur.execute("""
             SELECT *
             FROM report.student_mock_dashboard_vw
@@ -28,9 +30,19 @@ def student_mock_dashboard_vw():
         row = cur.fetchone()
 
         if not row:
-            return api_response(message="No data", code=200, status="success", data={})
+            return api_response(
+                message="No data",
+                code=200,
+                status="success",
+                data={
+                    "mcq": {
+                        "level_matrix": [],
+                        "chapters": []
+                    }
+                }
+            )
 
-        # ✅ LEVEL NORMALIZATION (L1–L4 ALWAYS)
+        # 🔢 LEVEL NORMALIZATION (L1–L4 FIXED)
         level_order = ["L1", "L2", "L3", "L4"]
 
         def normalize(levels):
@@ -49,7 +61,6 @@ def student_mock_dashboard_vw():
             ]
 
         mcq = row.get("mcq") or {}
-        quiz = row.get("quiz") or {}
 
         return api_response(
             message="Mock Dashboard Loaded",
@@ -59,10 +70,6 @@ def student_mock_dashboard_vw():
                 "mcq": {
                     "level_matrix": normalize(mcq.get("level_matrix")),
                     "chapters": mcq.get("chapters") or []
-                },
-                "quiz": {
-                    "level_matrix": normalize(quiz.get("level_matrix")),
-                    "chapters": quiz.get("chapters") or []
                 }
             }
         )
