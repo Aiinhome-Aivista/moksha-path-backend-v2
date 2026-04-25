@@ -190,14 +190,27 @@ import os
 import uuid
 from flask import request, send_from_directory
 import jwt
+from pathlib import Path
 from config import JWT_SECRET, get_db_connection, HOST_URL
 from utils.api_response import api_response
 
-AZURE_WWWROOT = "/home/site/wwwroot"
-# Match blog_controller behavior on Azure, but remain usable locally.
-BASE_DIR = os.getenv("BASE_DIR") or (AZURE_WWWROOT if os.path.exists(AZURE_WWWROOT) else os.getcwd())
-UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads", "notes")
 
+def _resolve_upload_folder() -> str:
+    """Resolve upload folder: use UPLOADS_BASE_DIR env, Azure path if exists, else project root."""
+    override = os.getenv("UPLOADS_BASE_DIR")
+    if override:
+        return str(Path(override) / "uploads" / "notes")
+
+    azure_path = Path("/home/site/wwwroot")
+    if azure_path.exists():
+        return str(azure_path / "uploads" / "notes")
+
+    project_root = Path(__file__).resolve().parents[2]
+    return str(project_root / "uploads" / "notes")
+
+
+
+UPLOAD_FOLDER = _resolve_upload_folder()
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 
@@ -205,7 +218,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 # ✅ FILE SERVE ROUTE
 # =========================
 def register_routes(app):
-    @app.route('/uploads/notes/<path:filename>')
+    @app.route("/uploads/notes/<path:filename>")
     def serve_notes(filename):
         return send_from_directory(UPLOAD_FOLDER, filename)
 
@@ -313,8 +326,8 @@ def upload_study_material():
                     title,
                     description,
                     file_type,
-                    None,        # file_name
-                    None,        # file_url
+                    None,  # file_name
+                    None,  # file_url
                     link_url,
                     uploaded_by,
                 ),
@@ -345,11 +358,11 @@ def upload_study_material():
                 file_path = os.path.join(UPLOAD_FOLDER, unique_name)
                 file.save(file_path)
 
-                # ✅ FULL URL (dynamic like blog_controller)
-                file_url = f"{HOST_URL}/uploads/notes/{unique_name}"
+                # ✅ Store only relative URL (host will be auto-detected by client/frontend)
+                file_url = f"/uploads/notes/{unique_name}"
 
                 cursor.execute(
-                """
+                    """
                 CALL learning.sp_upload_study_material(
                     %s::int,
                     %s::int,
@@ -367,22 +380,22 @@ def upload_study_material():
                     NULL
                 )
                 """,
-                (
-                    board_id,
-                    institute_id,
-                    class_id,
-                    subject_id,
-                    chapter_id,
-                    section_id,
-                    title,
-                    description,
-                    file_type,
-                    file.filename,
-                    file_url,
-                    None,
-                    uploaded_by,
-                ),
-    )
+                    (
+                        board_id,
+                        institute_id,
+                        class_id,
+                        subject_id,
+                        chapter_id,
+                        section_id,
+                        title,
+                        description,
+                        file_type,
+                        file.filename,
+                        file_url,
+                        None,
+                        uploaded_by,
+                    ),
+                )
 
         conn.commit()
         cursor.close()
