@@ -1,8 +1,25 @@
-from flask import request
 from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
 import psycopg2.extras
+
+
+def convert_numeric(data):
+    for key, value in data.items():
+        try:
+            num = float(value)
+
+            # 👉 if integer type
+            if num.is_integer():
+                data[key] = int(num)
+            else:
+                data[key] = num
+
+        except (ValueError, TypeError):
+            pass
+
+    return data
+
 
 
 def student_performance_vw():
@@ -10,92 +27,65 @@ def student_performance_vw():
     cur = None
 
     try:
-        # 🔐 USER AUTH
+        #  AUTH
         user_id_str, _ = TokenVerifier.get_user_id()
         if not user_id_str:
-            return api_response(message="Unauthorized", code=401, status="error")
+            return api_response(
+                message="Unauthorized",
+                code=401,
+                status="error"
+            )
 
         user_id = int(user_id_str)
 
-        # 🛢 DB CONNECT
+        #  DB CONNECT
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         # =========================
-        # 🔥 1. PERFORMANCE DATA
+        #  1. MAIN PERFORMANCE (ALL KPI IN ONE VIEW)
         # =========================
         cur.execute("""
             SELECT *
-            FROM report.student_performance_vw
-            WHERE user_id = %s
-            ORDER BY attempt_id ASC
-        """, (user_id,))
-        performance = cur.fetchall()
-
-        # =========================
-        # 🔥 2. TOP SUMMARY
-        # =========================
-        cur.execute("""
-            SELECT *
-            FROM report.student_dashboard_summary_vw
+            FROM report.student_performance_v1_vw
             WHERE user_id = %s
         """, (user_id,))
-        summary = cur.fetchone() or {}
 
-        # =========================
-        # 🔥 3. TIME DISTRIBUTION
-        # =========================
-        cur.execute("""
-            SELECT *
-            FROM report.student_time_distribution_vw
-            WHERE user_id = %s
-        """, (user_id,))
-        time_dist_rows = cur.fetchall()
+        performance = cur.fetchone()
 
+        if not performance:
+            return api_response(
+                message="No data found",
+                code=404,
+                status="error"
+            )
+        performance = convert_numeric(performance)
+        # =========================
+        #  2. TIME DISTRIBUTION (FORMAT FOR UI)
+        # =========================
         time_distribution = [
-            {
-                "level": row["difficulty_level"],
-                "avg_time": float(row["avg_time"])
-            }
-            for row in time_dist_rows
+            {"level": "Easy", "avg_time": float(performance.get("easy_avg_time", 0))},
+            {"level": "Medium", "avg_time": float(performance.get("medium_avg_time", 0))},
+            {"level": "Hard", "avg_time": float(performance.get("hard_avg_time", 0))},
+            {"level": "Expert", "avg_time": float(performance.get("expert_avg_time", 0))}
         ]
 
         # =========================
-        # 🔥 4. MODULE TEST COUNT
-        # =========================
-        cur.execute("""
-            SELECT 
-                COUNT(*) AS total_module_tests,
-                COUNT(*) FILTER (WHERE LOWER(status) = 'completed') AS completed_module_tests
-            FROM learning.student_assessments_assigned
-            WHERE student_id = %s
-        """, (user_id,))
-
-        module_stats = cur.fetchone() or {}
-
-        # =========================
-        # 🔥 MERGE INTO SUMMARY
-        # =========================
-        summary["total_module_tests"] = module_stats.get("total_module_tests", 0)
-        summary["completed_module_tests"] = module_stats.get("completed_module_tests", 0)
-
-        # =========================
-        # 🔥 FINAL RESPONSE
+        # FINAL RESPONSE
         # =========================
         return api_response(
-            message="Student Dashboard Loaded",
+            message="Student Performance Loaded",
             code=200,
             status="success",
             data={
-                "top_stats": summary,
-                "time_distribution": time_distribution,
-                "performance": performance
+                "performance": performance,
+                "time_distribution": time_distribution
             }
         )
 
     except Exception as e:
         return api_response(
-            message="Error fetching student dashboard",
+            message="Error fetching student performance",
             code=500,
             status="error",
             error=str(e)
