@@ -18,7 +18,7 @@ def login_logout_user():
         auth_header = request.headers.get('Authorization')
         if not auth_header:
             return api_response(message="Missing Token", code=401, status="error")
-        
+
         token = auth_header.split(" ")[1]
         decoded = jwt.decode(token, JWT_SECRET, algorithms=["HS256"], options={"verify_exp": False})
         user_id = decoded.get("sub")
@@ -36,4 +36,6 @@ def login_logout_user():
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

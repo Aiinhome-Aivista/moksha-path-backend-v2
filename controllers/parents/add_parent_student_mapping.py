@@ -3,8 +3,8 @@ from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier  
 import psycopg2.extras
- 
- 
+
+
 def add_parent_student_mapping():
     conn = None
     try:
@@ -14,7 +14,7 @@ def add_parent_student_mapping():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # ==========================================
@@ -28,12 +28,12 @@ def add_parent_student_mapping():
         if 'student_user_id' in data:
             s_id = int(data.get('student_user_id', 0))
             p_id = logged_in_user_id  # Automatically assign token ID as Parent
-            
+
         # Scenario B: Student is calling the API to add a Parent
         elif 'parent_user_id' in data:
             p_id = int(data.get('parent_user_id', 0))
             s_id = logged_in_user_id  # Automatically assign token ID as Student
-            
+
         else:
             return api_response(message="Please provide either 'student_user_id' or 'parent_user_id' in the payload.", code=400, status="error")
 
@@ -53,7 +53,7 @@ def add_parent_student_mapping():
             )
         """
         cur.execute(query, (logged_in_user_id, p_id, s_id))
-        
+
         result = cur.fetchone()
 
         if not result:
@@ -77,12 +77,9 @@ def add_parent_student_mapping():
     finally:
         if conn: 
             conn.close()
+            cur.close()
 
 
-
-
-
- 
 def search_user_for_mapping():
     conn = None
     try:
@@ -90,7 +87,7 @@ def search_user_for_mapping():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # 2. VALIDATE PAYLOAD (Now completely optional!)
@@ -132,11 +129,9 @@ def search_user_for_mapping():
     finally:
         if conn: 
             conn.close()
+            cur.close()
 
 
-
-
- 
 def manage_parent_student_mapping():
     conn = None
     try:
@@ -144,7 +139,7 @@ def manage_parent_student_mapping():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # 2. VALIDATE PAYLOAD
@@ -164,7 +159,7 @@ def manage_parent_student_mapping():
 
         # query = """
         #     CALL common.sp_manage_parent_student_mapping(
-        #         %s::INTEGER, %s::INTEGER, %s::VARCHAR, 
+        #         %s::INTEGER, %s::INTEGER, %s::VARCHAR,
         #         NULL, NULL, NULL
         #     )
         # """
@@ -194,7 +189,7 @@ def manage_parent_student_mapping():
     finally:
         if conn: 
             conn.close()
-
+            cur.close()
 
 
 def get_pending_mapping_requests():
@@ -204,7 +199,7 @@ def get_pending_mapping_requests():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # 2. DATABASE CALL
@@ -238,10 +233,9 @@ def get_pending_mapping_requests():
     finally:
         if conn: 
             conn.close()
+            cur.close()
 
 
- 
- 
 def get_invitation_all_summary():
     conn = None
     try:
@@ -249,7 +243,7 @@ def get_invitation_all_summary():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # 2. DATABASE CALL
@@ -258,7 +252,7 @@ def get_invitation_all_summary():
 
         # query = """
         #     CALL common.usp_get_assigned_users_list_v1(
-        #         %s::INTEGER, 
+        #         %s::INTEGER,
         #         NULL, NULL, NULL
         #     )
         # """
@@ -289,6 +283,7 @@ def get_invitation_all_summary():
     finally:
         if conn: 
             conn.close()
+            cur.close()
 
 
 def get_active_user_student_parent_list():
@@ -298,7 +293,7 @@ def get_active_user_student_parent_list():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # 2. DATABASE CALL
@@ -332,7 +327,7 @@ def get_active_user_student_parent_list():
     finally:
         if conn: 
             conn.close()
-
+            cur.close()
 
 
 def create_and_map_dependent_profile():
@@ -342,7 +337,7 @@ def create_and_map_dependent_profile():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         logged_in_user_id = int(user_id_str)
 
         # 2. PAYLOAD EXTRACTION
@@ -353,13 +348,13 @@ def create_and_map_dependent_profile():
         # Basic Info (Optional Email/Phone)
         p_email = data.get('email', '')
         p_phone = data.get('phone', '')
-        
+
         p_actual_name = data.get('actual_name', '')
         p_profile_name = data.get('profile_name', '')
-        
+
         # Determine Role to Create (If creating Student = 1, Parent = 2)
         p_role_id = int(data.get('role_id', 0))
-        
+
         # Academic Info (Mostly for students)
         p_board_id = data.get('board_id', None)
         p_class_id = data.get('class_id', None)
@@ -404,3 +399,4 @@ def create_and_map_dependent_profile():
     finally:
         if conn: 
             conn.close()
+            cur.close()

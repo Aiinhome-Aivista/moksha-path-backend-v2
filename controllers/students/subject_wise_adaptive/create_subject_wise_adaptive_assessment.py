@@ -122,3 +122,4 @@ def create_subject_wise_adaptive_assessment():
     finally:
         if conn:
             conn.close()
+            cur.close()

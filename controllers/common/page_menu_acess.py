@@ -71,7 +71,7 @@
 #         #     )
 #         #  Fetch active subscription from DB
 #         subscription_id = get_active_subscription(user_id)
-        
+
 #         if not subscription_id:
 #             return api_response(
 #                 message="Active subscription not found",
@@ -196,3 +196,4 @@ def get_user_menu():
     finally:
         if conn:
             conn.close()
+            cur.close()

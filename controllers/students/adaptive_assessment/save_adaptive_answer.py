@@ -5,7 +5,7 @@ from utils.api_response import api_response
 import psycopg2.extras
 import json
 import jwt 
- 
+
 def save_adaptive_answer():
     conn = None
     try:
@@ -13,7 +13,7 @@ def save_adaptive_answer():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-            
+
         student_id = int(user_id_str)
 
         # 2. GET PAYLOAD (With your new clean keys!)
@@ -45,7 +45,7 @@ def save_adaptive_answer():
                 NULL, NULL, NULL
             )
         """
-        
+
         cur.execute(query, (
             int(attempt_id), 
             student_id, 
@@ -55,7 +55,7 @@ def save_adaptive_answer():
             is_skipped,          # 🔥 Auto-calculated
             int(sl_no)           # 🔥 Safely mapped
         ))
-        
+
         result = cur.fetchone()
         conn.commit()
 
@@ -73,4 +73,6 @@ def save_adaptive_answer():
         print(f"CRITICAL_DEBUG: {repr(e)}") 
         return api_response(message="System Error", code=500, status="error", error=str(e))
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

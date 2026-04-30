@@ -118,7 +118,7 @@ def get_chapter_performance():
 #         conn = get_db_connection()
 #         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 #         # CHANGED TO sp_v3
-#         cur.execute("CALL learning.sp_v4_teacher_class_exam_performance(%s, %s, %s, %s, NULL, NULL, NULL)", 
+#         cur.execute("CALL learning.sp_v4_teacher_class_exam_performance(%s, %s, %s, %s, NULL, NULL, NULL)",
 #                     (teacher_id, subscription_id, class_id, set_id))
 #         result = cur.fetchone()
 #         return api_response(message=result['o_message'], code=result['o_status'], data=result['o_data'])
@@ -231,12 +231,14 @@ def get_teacher_profile_details():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
         cur.execute("CALL learning.sp_v1_teacher_profile_details(%s, %s, NULL, NULL, NULL)", (teacher_id, subscription_id))
         result = cur.fetchone()
-        
+
         return api_response(message=result['o_message'], code=result['o_status'], data=result['o_data'])
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
 
 
 # 10. Top 20 & Lowest 20 Students (Subject Wise)

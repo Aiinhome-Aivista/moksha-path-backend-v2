@@ -6,13 +6,12 @@ from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
 
 
-
 def skip_assessment_question():
     conn = None
     try:
         user_id_str, _ = TokenVerifier.get_user_id()
         logged_in_user_id = int(user_id_str)
-        
+
         json_data = request.get_json()
         attempt_id = json_data.get('attempt_id')
         question_id = json_data.get('question_id')
@@ -31,7 +30,7 @@ def skip_assessment_question():
             "CALL learning.usp_skip_assessment_question(%s, %s, %s, %s, %s, %s, NULL, NULL)",
             (subscription_id, logged_in_user_id, attempt_id, question_id, time_taken, sl_no)
         )
-        
+
         result = cur.fetchone()
         conn.commit()
 
@@ -44,4 +43,6 @@ def skip_assessment_question():
         if conn: conn.rollback()
         return api_response(message="Internal Error", error=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

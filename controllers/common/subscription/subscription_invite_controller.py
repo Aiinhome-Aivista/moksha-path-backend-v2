@@ -32,13 +32,15 @@ def send_invite_by_id():
 
         if result and result['o_status_code'] == 200:
             return api_response(message=result['o_message'], code=200)
-        
+
         return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
 
 # 2. GET MY PENDING INVITES (No Logic Changes, just safety check)
 def get_my_invites():
@@ -59,7 +61,9 @@ def get_my_invites():
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
 
 # 3. RESPOND TO INVITE (Logic inside SP handles the transaction insert now)
 def respond_invite_username():
@@ -86,13 +90,16 @@ def respond_invite_username():
 
         if result and result['o_status_code'] == 200:
             return api_response(message=result['o_message'], code=200)
-        
+
         return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
+
 
 # 4. GET INVITE HISTORY (Both Sent and Received, All Statuses)
 def get_invite_history():
@@ -101,7 +108,7 @@ def get_invite_history():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         user_id = int(user_id_str)
 
         conn = get_db_connection()
@@ -113,7 +120,7 @@ def get_invite_history():
                 %s, NULL, NULL, NULL, NULL
             )
         """, (user_id,))
-        
+
         result = cur.fetchone()
 
         if result and result['o_status_code'] == 200:
@@ -125,13 +132,15 @@ def get_invite_history():
                     "sent_invites": result['o_sent_invites']
                 }
             )
-        
+
         return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
 
 def undo_invite():
     """ 
@@ -143,7 +152,7 @@ def undo_invite():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         user_id = int(user_id_str)
 
         # 2. Get Payload
@@ -164,16 +173,18 @@ def undo_invite():
                 %s, %s, NULL, NULL
             )
         """, (user_id, invite_id))
-        
+
         result = cur.fetchone()
 
         # 5. Handle Response
         if result and result['o_status_code'] == 200:
             return api_response(message=result['o_message'], code=200, status="success")
-        
+
         return api_response(message=result['o_message'], code=result['o_status_code'], status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

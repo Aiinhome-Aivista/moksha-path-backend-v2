@@ -913,7 +913,17 @@ def check_db_connection():
     conn = None
     try:
         conn = get_db_connection()
+        db_name = os.getenv("DB_NAME")
+        db_user = os.getenv("DB_USER")
+        db_host = os.getenv("DB_HOST")
+        db_port = os.getenv("DB_PORT")
+
+       
         logger.info("Database connected successfully")
+        logger.info(f"Connected DB Details -> "
+                    f"Name: {db_name}, User: {db_user}, "
+                    f"Host: {db_host}, Port: {db_port}")
+
     except Exception as e:
         logger.error(f" Database connection failed: {e}")
     finally:

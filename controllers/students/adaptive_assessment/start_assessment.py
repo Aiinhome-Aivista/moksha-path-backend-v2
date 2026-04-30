@@ -1,4 +1,3 @@
-
 from flask import request
 from config import get_db_connection
 from utils.token_helper import TokenVerifier
@@ -14,7 +13,7 @@ def addaptive_start_assessment():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-            
+
         student_id = int(user_id_str)
 
         # 2. GET PAYLOAD
@@ -34,7 +33,7 @@ def addaptive_start_assessment():
                 NULL, NULL, NULL
             )
         """
-        
+
         cur.execute(query, (student_id, int(assignment_id)))
         result = cur.fetchone()
         conn.commit()
@@ -53,4 +52,6 @@ def addaptive_start_assessment():
         print(f"CRITICAL_DEBUG: {repr(e)}") 
         return api_response(message="System Error", code=500, status="error", error=str(e))
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

@@ -14,7 +14,7 @@ def get_full_manage_subscription_page():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-            
+
         user_id = int(user_id_str)
 
         # 2. Call DB
@@ -26,7 +26,7 @@ def get_full_manage_subscription_page():
                 %s, NULL, NULL, NULL
             )
         """, (user_id,))
-        
+
         result = cur.fetchone()
 
         # 3. Handle Response
@@ -49,3 +49,4 @@ def get_full_manage_subscription_page():
     finally:
         if conn: 
             conn.close()
+            cur.close()

@@ -5,7 +5,7 @@ from utils.api_response import api_response
 import psycopg2.extras
 import json
 import jwt   
- 
+
 def create_adaptive_set():
     conn = None
     try:
@@ -15,7 +15,7 @@ def create_adaptive_set():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-            
+
         logged_in_user_id = int(user_id_str)
 
         # =========================================================================
@@ -28,7 +28,7 @@ def create_adaptive_set():
         # Grab the token from the Header
         # sub_token = request.headers.get('Subscription-Id')
         sub_token = request.headers.get('Subscription-Id') or request.headers.get('Subscription-Token')
-        
+
         if not sub_token:
             return api_response(message="Subscription-Id header is missing.", code=400, status="error")
 
@@ -42,18 +42,18 @@ def create_adaptive_set():
         # Find the default subscription_id
         subscription_id = None
         roles = sub_payload.get('roles', [])
-        
+
         for role in roles:
             if role.get('is_default') is True:
                 subscription_id = role.get('subscription_id')
                 break
-        
+
         # Fallback to sub_id if loop fails
         if not subscription_id:
             subscription_id = sub_payload.get('sub_id') or sub_payload.get('subscription_id')
 
         if not subscription_id:
-             return api_response(message="Active Subscription ID not found for this user.", code=403, status="error")
+            return api_response(message="Active Subscription ID not found for this user.", code=403, status="error")
 
         # =========================================================================
         # 3. DATABASE CALL
@@ -71,7 +71,7 @@ def create_adaptive_set():
                 NULL, NULL, NULL
             )
         """
-        
+
         cur.execute(query_create, (
             logged_in_user_id,
             data.get('set_name', 'Adaptive Test'),
@@ -89,7 +89,7 @@ def create_adaptive_set():
             data.get('student_ids', []),
             data.get('due_date') 
         ))
-        
+
         result = cur.fetchone()
 
         res_status  = result.get('p_status', 'error')
@@ -102,11 +102,11 @@ def create_adaptive_set():
             # =========================================================================
             # We use the set_id returned in p_data to populate the generation table
             new_set_id = res_data.get('set_id')
-            
+
             if new_set_id:
                 # Using BIGINT cast to support billions of records as requested
                 cur.execute("CALL learning.usp_generate_question_slots(%s::BIGINT)", (new_set_id,))
-            
+
             conn.commit()
             return api_response(message=res_message, data=res_data, code=200, status="success")
         else:
@@ -118,4 +118,6 @@ def create_adaptive_set():
         print(f"CRITICAL_DEBUG: {repr(e)}") 
         return api_response(message="System Error", code=500, status="error", error=str(e))
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

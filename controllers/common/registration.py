@@ -59,3 +59,4 @@ def register_user():
     finally:
         if conn:
             conn.close()
+            cur.close()

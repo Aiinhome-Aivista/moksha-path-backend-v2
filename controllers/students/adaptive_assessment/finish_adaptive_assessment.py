@@ -6,7 +6,7 @@ import psycopg2.extras
 import json
 import jwt 
 
- 
+
 def finish_adaptive_assessment():
     conn = None
     try:
@@ -14,7 +14,7 @@ def finish_adaptive_assessment():
         user_id_str, auth_error = TokenVerifier.get_user_id()
         if not user_id_str: 
             return api_response(message="Unauthorized", code=401, status="error", error=auth_error)
-        
+
         # 2. PAYLOAD
         data = request.get_json()
         attempt_id = data.get('attempt_id')
@@ -28,7 +28,7 @@ def finish_adaptive_assessment():
             "CALL learning.usp_v2_finish_addaptive_assessment_with_log(%s, %s, %s, NULL, NULL, NULL)",
             (int(attempt_id), int(user_id_str), subscription_id)
         )
-        
+
         result = cur.fetchone()
         conn.commit()
 
@@ -51,4 +51,6 @@ def finish_adaptive_assessment():
         if conn: conn.rollback()
         return api_response(message="System Error", code=500, status="error", error=str(e))
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

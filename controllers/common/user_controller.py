@@ -24,7 +24,7 @@ def get_all_usernames():
                 NULL, NULL, NULL
             )
         """)
-        
+
         result = cur.fetchone()
 
         # 3. Handle Response
@@ -52,3 +52,4 @@ def get_all_usernames():
     finally:
         if conn: 
             conn.close()
+            cur.close()

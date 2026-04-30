@@ -27,10 +27,10 @@ def login_send_ui_otp():
         conn = get_db_connection()
         conn.autocommit = True
         cur = conn.cursor()
-        
+
         # Calls: usp_v1_send_otp_mobile_email_final (7 Args: username, email, phone, otp_out, message_out, status_out)
         # Note: In the SQL above, I removed the 'is_new_user' flag to simplify since this is strictly Login Flow.
-        # But if your DB still expects 7 args, adjust accordingly. 
+        # But if your DB still expects 7 args, adjust accordingly.
         # Based on my updated SQL above, it has 6 arguments.
         cur.execute(
             "CALL login.usp_v1_login_send_otp_mobile_email_final(%s, %s, %s, NULL::VARCHAR, NULL::VARCHAR, NULL::INTEGER)", 
@@ -46,13 +46,15 @@ def login_send_ui_otp():
                 send_sms_otp(mobile, otp_code)
 
             return api_response(message=result['p_message'], code=200)
-            
+
         return api_response(message=result['p_message'], code=result['p_status_code'], status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
 
 
 # =========================================================
@@ -74,7 +76,7 @@ def login_verify_ui_otp():
         conn = get_db_connection()
         conn.autocommit = True
         cur = conn.cursor()
-        
+
         # Calls: usp_v1_verify_otp_mobile_email_final
         cur.execute(
             "CALL login.usp_v1_login_verify_otp_mobile_email_final(%s, %s, %s, %s, NULL::VARCHAR, NULL::INTEGER)", 
@@ -84,13 +86,15 @@ def login_verify_ui_otp():
 
         if result['p_status_code'] == 200:
             return api_response(message="Verified Successfully", code=200)
-            
+
         return api_response(message=result['p_message'], code=400, status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()
 
 
 # =========================================================
@@ -105,27 +109,27 @@ def login_verify_ui_otp():
 #         email = data.get('email')
 #         mobile = data.get('mobile') or data.get('phone')
 
-#         if not username: 
+#         if not username:
 #             return api_response(message="Username is required", code=400, status="error")
 
 #         conn = get_db_connection()
 #         conn.autocommit = True
 #         cur = conn.cursor()
-        
+
 #         # 1. Generate MD5 Refresh Token
 #         random_str = str(uuid.uuid4())
 #         refresh_token = hashlib.md5(random_str.encode()).hexdigest()
-        
+
 #         ip = request.remote_addr
 #         agent = request.headers.get('User-Agent')
 
 #         # 2. Call Procedure: usp_v1_login_user
 #         cur.execute("""
 #             CALL login.usp_v1_login_user(
-#                 %s, %s, %s, %s, %s, %s, 
+#                 %s, %s, %s, %s, %s, %s,
 #                 NULL::INTEGER, NULL::VARCHAR, NULL::JSONB, NULL::INTEGER, NULL::VARCHAR, NULL::INTEGER
 #             )
-#             """, 
+#             """,
 #             (username, email, mobile, ip, agent, refresh_token)
 #         )
 #         result = cur.fetchone()
@@ -141,13 +145,13 @@ def login_verify_ui_otp():
 #                 "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
 #             }
 #             token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
-            
+
 #             return api_response(message=result['p_message'], code=200, data={
 #                 "token": token,
 #                 "refresh_token": refresh_token, # This is the MD5 hash
 #                 "user": payload
 #             })
-        
+
 #         return api_response(message=result['p_message'], code=result['p_status_code'], status="error")
 
 #     except Exception as e:
@@ -156,11 +160,10 @@ def login_verify_ui_otp():
 #         if conn: conn.close()
 
 
-
 # =========================================================
 # STEP 3: LOGIN (Generates MD5 Token)
 # =========================================================
- 
+
 
 def login_login_user():
     """ POST /api/v1/auth/login """
@@ -177,11 +180,11 @@ def login_login_user():
         conn = get_db_connection()
         conn.autocommit = True
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
-        
+
         # 1. Generate MD5 Refresh Token
         random_str = str(uuid.uuid4())
         refresh_token = hashlib.md5(random_str.encode()).hexdigest()
-        
+
         ip = request.remote_addr
         agent = request.headers.get('User-Agent')
 
@@ -214,18 +217,19 @@ def login_login_user():
                 "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=12)
             }
             token = jwt.encode(payload, JWT_SECRET, algorithm="HS256")
-            
+
             return api_response(message=result['p_message'], code=200, data={
                 "token": token,
                 "refresh_token": refresh_token,
                 "user": payload, # The frontend will see the roles with subscription_id here
                 "subscription_id": result['p_subscription_id']
             })
-        
+
         return api_response(message=result['p_message'], code=result['p_status_code'], status="error")
 
     except Exception as e:
         return api_response(message=str(e), code=500, status="error")
     finally:
-        if conn: conn.close()
-        if conn: conn.close()
+        if conn: 
+            conn.close()
+            cur.close()

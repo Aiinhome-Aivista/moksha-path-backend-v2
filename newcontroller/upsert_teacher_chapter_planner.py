@@ -87,7 +87,7 @@ import jwt
 #     finally:
 #         if conn:
 #             conn.close()
-            
+
 def upsert_teacher_chapter_planner():
     conn = None
     try:
@@ -228,8 +228,8 @@ def get_institute_admin_summary():
         return api_response(message="Internal Server Error", error=str(e), code=500, status="error")
     finally:
         if conn: conn.close()            
-        
-        
+
+
 def get_teacher_planer_data():
     conn = None
     try:
@@ -298,8 +298,9 @@ def get_teacher_planer_data():
     finally:
         if conn:
             conn.close()
-            
-            
+            cur.close()
+
+
 def get_student_planner_dashboard():
     conn = None
     try:
@@ -354,9 +355,10 @@ def get_student_planner_dashboard():
 
     finally:
         if conn:
-            conn.close()     
-            
-            
+            conn.close()
+            cur.close()
+
+
 # def generate_test_from_planner():
 #     conn = None
 #     try:
@@ -524,8 +526,9 @@ def generate_test_from_planner():
     finally:
         if conn:
             conn.close()
- 
- 
+            cur.close()
+
+
 def get_student_subjects_tab_info():
     conn = None
     try:
@@ -563,9 +566,10 @@ def get_student_subjects_tab_info():
 
     finally:
         if conn:
-            conn.close() 
-            
-            
+            conn.close()
+            cur.close()
+
+
 def get_multi_chapter_tests():
     conn = None
     try:
@@ -652,9 +656,10 @@ def get_multi_chapter_tests():
 
     finally:
         if conn:
-            conn.close()  
-            
-            
+            conn.close()
+            cur.close()
+
+
 def get_student_dashboard_view():
     conn = None
     try:
@@ -696,8 +701,9 @@ def get_student_dashboard_view():
 
     finally:
         if conn:
-            conn.close()                      
-            
+            conn.close()
+            cur.close()
+
 
 def get_teacher_dashboard_view():
     conn = None
@@ -739,4 +745,5 @@ def get_teacher_dashboard_view():
 
     finally:
         if conn:
-            conn.close()            
+            conn.close()
+            cur.close()

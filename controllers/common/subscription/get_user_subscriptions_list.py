@@ -51,3 +51,4 @@ def get_user_subscriptions_list():
     finally:
         if conn:
             conn.close()
+            cur.close()
