@@ -20,14 +20,13 @@ DB_CONFIG = {
     "password": os.getenv("DB_PASSWORD"),
 }
 
+
 def get_db_connection():
-    conn = psycopg2.connect(
-        **DB_CONFIG,
-        cursor_factory=RealDictCursor
-    )
-    conn.autocommit = True 
-    
+    conn = psycopg2.connect(**DB_CONFIG, cursor_factory=RealDictCursor)
+    conn.autocommit = True
+
     return conn
+
 
 # # Email Credential (from env)
 # EMAIL_HOST = os.getenv("EMAIL_HOST")
@@ -35,8 +34,6 @@ def get_db_connection():
 # EMAIL_USER = os.getenv("EMAIL_USER")
 # EMAIL_PASSWORD = os.getenv("EMAIL_PASSWORD")
 
-
- 
 
 # ==========================================
 # TWILIO SMS CONFIGURATION (Updated)
@@ -53,7 +50,7 @@ FROM_EMAIL = os.getenv("FROM_EMAIL")
 
 
 # LLM Configuration
-ACTIVE_LLM = os.getenv("ACTIVE_LLM") # Default to mistral
+ACTIVE_LLM = os.getenv("ACTIVE_LLM")  # Default to mistral
 MISTRAL_API_KEY = os.getenv("MISTRAL_API_KEY")
 MISTRAL_MODEL = os.getenv("MISTRAL_MODEL")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

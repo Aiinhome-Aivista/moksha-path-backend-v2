@@ -1,9 +1,7 @@
 from flask import jsonify
 
 def api_response(data=None, message="Success", code=200, status="success", error=None):
-    """
-    Generates a standardized API response.
-    """
+   
     response_body = {
         "status": status,
         "code": code,
