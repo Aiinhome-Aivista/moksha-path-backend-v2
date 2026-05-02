@@ -1,6 +1,7 @@
 from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
+from utils.remediation_helper import get_remediation_pointers
 import psycopg2.extras
 import json
 
@@ -37,11 +38,20 @@ def student_remediation_dashboard():
                 status="error"
             )
 
-        # JSON parse (important)
-        data = row.get("final_json")
+        # Fetch student performance data
+        student_performance = row.get("final_json")
+        
+        # Parse original data (maintain previous structure)
+        if isinstance(student_performance, str):
+            data = json.loads(student_performance)
+        else:
+            data = student_performance
 
-        if isinstance(data, str):
-            data = json.loads(data)
+        # =========================
+        # AI INSIGHTS GENERATION
+        # =========================
+        # Using the helper to get insights and adding it to original data
+        data["remediation"] = get_remediation_pointers(student_performance)
 
         # =========================
         # FINAL RESPONSE
@@ -52,6 +62,8 @@ def student_remediation_dashboard():
             status="success",
             data=data
         )
+
+
 
     except Exception as e:
         return api_response(
