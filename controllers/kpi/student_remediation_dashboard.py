@@ -2,7 +2,8 @@ from config import get_db_connection
 from utils.api_response import api_response
 from utils.token_helper import TokenVerifier
 import psycopg2.extras
-from controllers.kpi.student_performance_vw import convert_numeric
+import json
+
 
 def student_remediation_dashboard():
     conn = None
@@ -19,99 +20,42 @@ def student_remediation_dashboard():
         cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
 
         # =========================
-        # PERFORMANCE
+        # ONLY NEW VIEW CALL
         # =========================
         cur.execute("""
-            SELECT *
-            FROM report.student_performance_v1_vw
+            SELECT final_json
+            FROM report.student_remediation_vw
             WHERE user_id = %s
         """, (user_id,))
-        performance = cur.fetchone() or {}
-        performance = convert_numeric(performance)
 
-        # =========================
-        # SUBJECTS
-        # =========================
-        cur.execute("""
-            SELECT *
-            FROM report.student_subject_dashboard_v1_vw
-            WHERE user_id = %s
-        """, (user_id,))
-        subjects_raw = cur.fetchall()
+        row = cur.fetchone()
 
-        subjects = [
-            {
-                "subject_id": s.get("subject_id"),
-                "subject_name": s.get("subject_name"),
-                "chapters": s.get("chapters") or []
-            }
-            for s in subjects_raw
-        ]
+        if not row:
+            return api_response(
+                message="No data found",
+                code=404,
+                status="error"
+            )
 
-        # =========================
-        # MOCKS
-        # =========================
-        cur.execute("""
-            SELECT *
-            FROM report.student_mock_dashboard_v1_vw
-            WHERE user_id = %s
-            ORDER BY attempt_id ASC
-        """, (user_id,))
-        mocks_raw = cur.fetchall()
+        # JSON parse (important)
+        data = row.get("final_json")
 
-        level_order = ["L1", "L2", "L3", "L4"]
-
-        def normalize(levels):
-            mp = {l["level"]: l for l in (levels or [])}
-            return [
-                mp.get(lvl, {
-                    "level": lvl,
-                    "attempted": 0,
-                    "correct": 0,
-                    "wrong": 0,
-                    "skipped": 0,
-                    "accuracy": 0,
-                    "avg_time": 0
-                })
-                for lvl in level_order
-            ]
-
-        mocks = []
-        for row in mocks_raw:
-            mocks.append({
-                "attempt_id": row.get("attempt_id"),
-                "mock_name": row.get("mock_name"),
-                "attempt_date": row.get("attempt_date"),
-                "overall_score": float(row.get("overall_score") or 0),
-                "accuracy_rate": float(row.get("accuracy_rate") or 0),
-                "avg_time_per_question": float(row.get("avg_time_per_question") or 0),
-                "level_matrix": normalize(row.get("difficulty_matrix")),
-                "chapters": row.get("chapter_progression") or []
-            })
+        if isinstance(data, str):
+            data = json.loads(data)
 
         # =========================
         # FINAL RESPONSE
         # =========================
         return api_response(
-            message="Full Dashboard Loaded",
+            message="Student Remediation Dashboard Loaded",
             code=200,
             status="success",
-            data={
-                "performance": performance,
-                "subjects": {
-                    "total_subjects": len(subjects),
-                    "list": subjects
-                },
-                "mocks": {
-                    "total_mocks": len(mocks),
-                    "list": mocks
-                }
-            }
+            data=data
         )
 
     except Exception as e:
         return api_response(
-            message="Error fetching dashboard",
+            message="Error fetching remediation dashboard",
             code=500,
             status="error",
             error=str(e)
