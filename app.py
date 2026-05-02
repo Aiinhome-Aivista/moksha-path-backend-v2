@@ -118,7 +118,7 @@ from controllers.students.subject_wise_adaptive.create_subject_wise_adaptive_ass
 from controllers.kpi.student_performance_vw import student_performance_vw
 from controllers.kpi.student_subject_dashboard_vw import student_subject_dashboard_vw
 from controllers.kpi.student_mock_dashboard_vw import student_mock_dashboard_vw
-from controllers.kpi.student_remediation_dashboard import student_remediation_dashboard
+from controllers.kpi.student_remediation_dashboard import student_remediation_dashboard, student_remediation_ai_insights
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -905,6 +905,10 @@ def teacher_dashboard_vw_route():
 @app.route(LEARNING + "/student_remediation_dashboard", methods=["GET"])
 def student_remediation_dashboard_route():
     return student_remediation_dashboard()
+
+@app.route(LEARNING + "/student_remediation_ai_insights", methods=["GET"])
+def student_remediation_ai_insights_route():
+    return student_remediation_ai_insights()
 
 # ==========================================
 # 4. UTILITIES & STARTUP
