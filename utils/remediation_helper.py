@@ -64,13 +64,20 @@ def get_remediation_pointers(student_performance_data):
         student_performance_str = student_performance_data
 
     # Exact prompt as per your requirement
-    prompt = f"""You are given a JSON object containing the multiple Chapter wise performance data of a student for varoius subjects, including accuracy and average time per difficulty level.
+    prompt = f"""You are given a JSON object containing the multiple Chapter wise performance data of a student for various subjects, including accuracy and average time per difficulty level.
 
 input_json_object = {student_performance_str}
 
 Generate chapter-wise remediation pointers focused on areas the student needs to improve.
 **Instructions:**  
-- Provide only remediation pointers for each chapter for each subject.  
+- Provide exactly 5 short and actionable remediation pointers for each chapter in each subject.  
+- Each pointer must follow this style: "[Actionable Goal]: [Specific performance insight from data]. [Recommendation]."
+- Example styles:
+  1. "Master L1 first: Accuracy is below 60% on basics. Engine won't escalate until you are consistent."
+  2. "Push L2 past 70%: Currently at 52% accuracy (borderline). Timed practice sessions will help."
+  3. "Address L3 Accuracy: 36% accuracy detected. Focus on advanced theorems to unlock next levels."
+  4. "Optimize Time: Spending 120s+ on Easy questions. Practice speed drills to improve efficiency."
+  5. "Consistency Check: High variance in L1 scores. Aim for 80%+ consistency across all sub-topics."
 - Do not include progress, overall accuracy, or performance summaries.  
 - Output must strictly follow this JSON structure:
 {{
@@ -81,15 +88,11 @@ Generate chapter-wise remediation pointers focused on areas the student needs to
           {{
             "chapter_name": "<chapter_name>",
             "remediation_pointers": [
-              "<pointer 1>",
-              "<pointer 2>",
-              "... more pointers ..."
-            ]
-          }},
-          {{
-            "chapter_name": "<chapter_name>",
-            "remediation_pointers": [
-              "... pointers for this chapter ..."
+              "<Pointer 1>",
+              "<Pointer 2>",
+              "<Pointer 3>",
+              "<Pointer 4>",
+              "<Pointer 5>"
             ]
           }}
           // more chapters if available
@@ -99,7 +102,7 @@ Generate chapter-wise remediation pointers focused on areas the student needs to
   }}
 }}
 
-Use the 'student_performance' input and generate remediation pointers tailored to the student's areas of weakness in each chapter.
+Use the 'input_json_object' input and generate exactly 5 concise remediation pointers tailored to the student's specific areas of weakness and time management in each chapter.
 """
     # Get raw response from AI
     raw_response = get_response(prompt)
