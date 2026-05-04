@@ -119,6 +119,7 @@ from controllers.kpi.student_performance_vw import student_performance_vw
 from controllers.kpi.student_subject_dashboard_vw import student_subject_dashboard_vw
 from controllers.kpi.student_mock_dashboard_vw import student_mock_dashboard_vw
 from controllers.kpi.student_remediation_dashboard import student_remediation_dashboard, student_remediation_ai_insights
+from controllers.kpi.principal_dashboard_vw import principal_dashboard_kpi
 # ==========================================
 # 1. SETUP & CONFIGURATION
 # ==========================================
@@ -794,6 +795,10 @@ def author_list_route():
 def blog_images(filename):
     return send_from_directory(UPLOAD_FOLDER, filename)
 
+
+@app.route(INSTITUTE_ADMIN_URL + '/dashboard', methods=['GET'])
+def principal_dashboard_kpi_route():
+    return principal_dashboard_kpi()
 
 # Analytics Url
 @app.route(ANALYTICS_URL + "/user-events", methods=["POST"])
