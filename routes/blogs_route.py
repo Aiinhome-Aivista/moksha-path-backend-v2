@@ -1,7 +1,4 @@
-from controllers.blogs.get_blogs import get_blogs
-from controllers.blogs.insert_update_blog import insert_update_blog
-from controllers.blogs.delete_blog import delete_blog
-from controllers.blogs.get_public_blogs import get_public_blogs
+from controllers.blogs.blog_controller import get_blogs, insert_update_blog, delete_blog, get_public_blogs
 
 
 def register_blog_routes(app):
@@ -9,17 +6,17 @@ def register_blog_routes(app):
     BLOG_URL = '/api/v1/blogs'
 
     @app.route(BLOG_URL + '/blogs', methods=['GET'])
-    def blog_list_route():
+    def get_blogs_route():
         return get_blogs()
 
     @app.route(BLOG_URL + '/blog/insert-update', methods=['POST'])
-    def blog_save_route():
+    def insert_update_blog_route():
         return insert_update_blog()
 
     @app.route(BLOG_URL + '/blog/delete', methods=['POST'])
-    def blog_delete_route():
+    def delete_blog_route():
         return delete_blog()
 
     @app.route(BLOG_URL + '/public-blogs', methods=['GET'])
-    def public_blogs():
+    def get_public_blogs_route():
         return get_public_blogs()
