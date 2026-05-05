@@ -1,5 +1,6 @@
 from config import get_db_connection
 from utils.api_response import api_response
+from utils.remediation_helper import generate_principal_insights_ai
 from utils.token_helper import TokenVerifier
 import psycopg2.extras
 from decimal import Decimal
@@ -58,7 +59,8 @@ def principal_dashboard_kpi():
             merged_data.update(part1)
         if part2:
             merged_data.update(part2)
-
+        
+        merged_data["principal_insights"] = generate_principal_insights_ai(merged_data)
         if not merged_data:
              return api_response(
                 message="No KPI data found for this principal",
