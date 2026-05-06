@@ -156,7 +156,8 @@ def get_multi_chapter_tests():
         if conn:
             conn.close()  
 
- 
+# get student subject tab info 
+
 def get_student_subjects_tab_info():
     conn = None
     try:
@@ -196,6 +197,7 @@ def get_student_subjects_tab_info():
         if conn:
             conn.close() 
             
+# get student dashboard view       
         
 def get_student_dashboard_view():
     conn = None
