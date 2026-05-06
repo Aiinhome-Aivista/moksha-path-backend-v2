@@ -1,9 +1,12 @@
+from routes.users_route import register_user_routes
+from routes.auth_route import register_auth_routes
+from routes.blogs_route import register_blog_routes
 import os
 import logging
 from flask import Flask
 from flask_cors import CORS
 from config import get_db_connection
-from routes.blogs_route import register_blog_routes
+
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for frontend communication
@@ -14,6 +17,8 @@ logger = logging.getLogger(__name__)
 
 #  register routes properly
 register_blog_routes(app)
+register_auth_routes(app)
+register_user_routes(app)
 
 @app.route("/")
 def health():
