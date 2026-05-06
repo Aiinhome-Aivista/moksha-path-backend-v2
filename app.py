@@ -1,3 +1,6 @@
+from routes.student_route import register_student_routes
+from routes.admin_route import register_admin_routes
+from routes.teacher_route import register_teacher_routes
 from routes.users_route import register_user_routes
 from routes.auth_route import register_auth_routes
 from routes.blogs_route import register_blog_routes
@@ -19,6 +22,9 @@ logger = logging.getLogger(__name__)
 register_blog_routes(app)
 register_auth_routes(app)
 register_user_routes(app)
+register_teacher_routes(app)
+register_admin_routes(app)
+register_student_routes(app)
 
 @app.route("/")
 def health():
