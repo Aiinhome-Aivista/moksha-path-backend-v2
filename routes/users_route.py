@@ -2,26 +2,27 @@ from controllers.common.users.user_profile_details import get_user_profile ,get_
 from controllers.common.users.page_menu_access import get_user_menu
 
 def register_user_routes(app):
-    USERS_URL = '/api/v1/users'
+    USER_URL = '/api/v1/user'
 
 # page access routes
 
-    @app.route(USERS_URL + '/get-user-menu', methods=['POST'])
-    def get_user_menu_page():
+    @app.route(USER_URL + '/menu/page_acess', methods=["POST"])  # Changed from GET to POST
+    def get_user_menu_route():
         return get_user_menu()
 
 # getting user profile functions
 
-    @app.route(USERS_URL + '/get-user-profile', methods=['POST'])
-    def get_profile():
+    @app.route(USER_URL +'/profile_info', methods=['GET'])
+    def fetch_profile():
         return get_user_profile()
 
-# update profile details   
-    @app.route(USERS_URL + '/update-user-profile', methods=['POST'])
-    def update_profile():
+# update profile details
+#    
+    @app.route(USER_URL +'/update_profile', methods=['POST'])
+    def save_profile():
         return update_user_profile()
 
 # getting academic details   
-    @app.route(USERS_URL + '/get-academic-details', methods=['POST'])
-    def get_academic_detail():
+    @app.route(USER_URL +'/user_academic_info', methods=['GET'])
+    def user_academic_details():
         return get_academic_details()
